@@ -1,284 +1,533 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Asistente de Computación</title>
-  <style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Linubot - Terminal</title>
+
+<style>
     * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
+        background: #0a0e27;
+        font-family: 'Courier New', monospace;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .matrix-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        opacity: 0.15;
     }
 
     .container {
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      width: 100%;
-      max-width: 700px;
-      overflow: hidden;
+        width: 100%;
+        max-width: 700px;
+        height: 90vh;
+        background: rgba(10, 14, 39, 0.95);
+        border-radius: 12px;
+        border: 2px solid #00ff41;
+        box-shadow: 0 0 40px rgba(0, 255, 65, 0.3),
+                    inset 0 0 60px rgba(0, 255, 65, 0.05);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        position: relative;
+        z-index: 1;
+        animation: borderGlow 3s infinite alternate;
+    }
+
+    @keyframes borderGlow {
+        0% { box-shadow: 0 0 40px rgba(0, 255, 65, 0.3), inset 0 0 60px rgba(0, 255, 65, 0.05); }
+        100% { box-shadow: 0 0 60px rgba(0, 255, 65, 0.5), inset 0 0 80px rgba(0, 255, 65, 0.08); }
+    }
+
+    .scan-line {
+        position: absolute;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #00ff41, transparent);
+        animation: scan 4s linear infinite;
+        z-index: 2;
+        opacity: 0.3;
+    }
+
+    @keyframes scan {
+        0% { top: 0; }
+        100% { top: 100%; }
     }
 
     .header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 30px;
-      text-align: center;
+        padding: 20px 24px;
+        background: linear-gradient(135deg, #0d1117 0%, #1a1f2e 100%);
+        color: #00ff41;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        border-bottom: 2px solid #00ff41;
+        position: relative;
+        overflow: hidden;
     }
 
-    .header h2 {
-      font-size: 28px;
-      margin-bottom: 8px;
+    .header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.1), transparent);
+        animation: headerShine 3s infinite;
     }
 
-    .header p {
-      opacity: 0.9;
-      font-size: 14px;
+    @keyframes headerShine {
+        0% { left: -100%; }
+        100% { left: 100%; }
     }
 
-    .chat-container {
-      padding: 30px;
-      max-height: 500px;
-      overflow-y: auto;
+    .header-icon {
+        width: 48px;
+        height: 48px;
+        background: rgba(0, 255, 65, 0.1);
+        border: 2px solid #00ff41;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        animation: iconPulse 2s infinite;
+    }
+
+    @keyframes iconPulse {
+        0%, 100% { transform: scale(1); box-shadow: 0 0 10px rgba(0, 255, 65, 0.5); }
+        50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(0, 255, 65, 0.8); }
+    }
+
+    .header-content h1 {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 4px;
+        text-shadow: 0 0 10px rgba(0, 255, 65, 0.8);
+        letter-spacing: 2px;
+    }
+
+    .header-content p {
+        font-size: 12px;
+        opacity: 0.8;
+        color: #00ff41;
+        letter-spacing: 1px;
+    }
+
+    .status-indicator {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 11px;
+        color: #00ff41;
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        background: #00ff41;
+        border-radius: 50%;
+        animation: blink 1.5s infinite;
+    }
+
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+    }
+
+    .chat-box {
+        flex: 1;
+        padding: 24px;
+        overflow-y: auto;
+        background: rgba(10, 14, 39, 0.8);
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .chat-box::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .chat-box::-webkit-scrollbar-track {
+        background: rgba(0, 255, 65, 0.05);
+    }
+
+    .chat-box::-webkit-scrollbar-thumb {
+        background: #00ff41;
+        border-radius: 10px;
+    }
+
+    .message-row {
+        display: flex;
+        align-items: flex-end;
+        gap: 12px;
+        animation: slideUp 0.4s ease-out;
+    }
+
+    .message-row.user {
+        flex-direction: row-reverse;
     }
 
     .message {
-      margin-bottom: 20px;
-      animation: fadeIn 0.3s ease-in;
+        max-width: 75%;
+        padding: 14px 18px;
+        border-radius: 4px;
+        font-size: 14px;
+        line-height: 1.6;
+        word-wrap: break-word;
+        position: relative;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 0.5px;
     }
 
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .user-msg {
+        background: rgba(0, 255, 65, 0.1);
+        color: #00ff41;
+        border: 1px solid #00ff41;
+        border-left: 4px solid #00ff41;
+        box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
     }
 
-    .message-label {
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: #667eea;
-      font-size: 14px;
+    .bot-msg {
+        background: rgba(0, 150, 255, 0.05);
+        color: #00d9ff;
+        border: 1px solid #00d9ff;
+        border-left: 4px solid #00d9ff;
+        box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
     }
 
-    .message-content {
-      background: #f7f7f7;
-      padding: 15px;
-      border-radius: 12px;
-      line-height: 1.6;
-      color: #333;
+    .avatar {
+        font-size: 28px;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        background: rgba(0, 255, 65, 0.1);
+        border: 1px solid #00ff41;
+        flex-shrink: 0;
     }
 
-    .message.user .message-label {
-      color: #764ba2;
+    .message-row.user .avatar {
+        background: rgba(0, 255, 65, 0.15);
+        border-color: #00ff41;
     }
 
-    .message.user .message-content {
-      background: #e9e3f5;
-    }
-
-    .input-container {
-      padding: 20px 30px 30px;
-      border-top: 1px solid #eee;
+    .input-area {
+        padding: 20px 24px;
+        background: linear-gradient(135deg, #0d1117 0%, #1a1f2e 100%);
+        border-top: 2px solid #00ff41;
+        display: flex;
+        gap: 12px;
+        align-items: center;
     }
 
     .input-wrapper {
-      display: flex;
-      gap: 10px;
+        flex: 1;
+        position: relative;
     }
 
-    #pregunta {
-      flex: 1;
-      padding: 15px;
-      border: 2px solid #e0e0e0;
-      border-radius: 12px;
-      font-size: 15px;
-      transition: border-color 0.3s;
-      font-family: inherit;
+    .input-wrapper::before {
+        content: '>';
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #00ff41;
+        font-size: 16px;
+        font-weight: bold;
     }
 
-    #pregunta:focus {
-      outline: none;
-      border-color: #667eea;
+    input {
+        width: 100%;
+        padding: 14px 20px 14px 35px;
+        border-radius: 4px;
+        border: 2px solid #00ff41;
+        background: rgba(0, 255, 65, 0.05);
+        color: #00ff41;
+        font-size: 14px;
+        outline: none;
+        transition: all 0.3s ease;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 1px;
+    }
+
+    input:focus {
+        background: rgba(0, 255, 65, 0.1);
+        box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+    }
+
+    input::placeholder {
+        color: rgba(0, 255, 65, 0.5);
     }
 
     button {
-      padding: 15px 30px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
+        background: rgba(0, 255, 65, 0.1);
+        border: 2px solid #00ff41;
+        color: #00ff41;
+        padding: 14px 28px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 700;
+        transition: all 0.3s ease;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 2px;
+        text-transform: uppercase;
     }
 
     button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        background: rgba(0, 255, 65, 0.2);
+        box-shadow: 0 0 30px rgba(0, 255, 65, 0.5);
+        transform: translateY(-2px);
     }
 
     button:active {
-      transform: translateY(0);
+        transform: translateY(0);
     }
 
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
+    @keyframes slideUp {
+        from { 
+            opacity: 0; 
+            transform: translateX(-20px); 
+        }
+        to { 
+            opacity: 1; 
+            transform: translateX(0); 
+        }
     }
 
-    .loading {
-      display: none;
-      text-align: center;
-      padding: 20px;
-      color: #667eea;
+    .typing {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 18px;
+        background: rgba(0, 217, 255, 0.05);
+        border-radius: 4px;
+        border: 1px solid #00d9ff;
+        border-left: 4px solid #00d9ff;
+        box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
+        max-width: 120px;
     }
 
-    .loading.active {
-      display: block;
+    .typing-dots {
+        display: flex;
+        gap: 4px;
     }
 
-    .spinner {
-      border: 3px solid #f3f3f3;
-      border-top: 3px solid #667eea;
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      animation: spin 1s linear infinite;
-      margin: 0 auto;
+    .typing-dots span {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #00d9ff;
+        animation: typingPulse 1.4s infinite;
     }
 
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    .typing-dots span:nth-child(2) {
+        animation-delay: 0.2s;
     }
 
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-      color: #999;
+    .typing-dots span:nth-child(3) {
+        animation-delay: 0.4s;
     }
 
-    .empty-state svg {
-      width: 80px;
-      height: 80px;
-      margin-bottom: 15px;
-      opacity: 0.3;
+    @keyframes typingPulse {
+        0%, 100% { opacity: 0.3; transform: scale(0.8); }
+        50% { opacity: 1; transform: scale(1.2); }
     }
-  </style>
+</style>
 </head>
 <body>
-  <div class="container">
+
+<canvas class="matrix-bg" id="matrix"></canvas>
+
+<div class="container">
+    <div class="scan-line"></div>
+    
     <div class="header">
-      <h2>💻 Asistente de Computación</h2>
-      <p>Haz tus preguntas sobre tecnología y programación</p>
+        <div class="header-icon">⚡</div>
+        <div class="header-content">
+            <h1>LINUBOT</h1>
+            <p>SISTEMA OPERATIVO: LINUX v2.0</p>
+        </div>
+        <div class="status-indicator">
+            <div class="status-dot"></div>
+            <span>ONLINE</span>
+        </div>
     </div>
 
-    <div class="chat-container" id="chatContainer">
-      <div class="empty-state">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-        </svg>
-        <p>Escribe tu primera pregunta para comenzar</p>
-      </div>
+    <div class="chat-box" id="chat">
+        <div class="message-row">
+            <div class="avatar">⚡</div>
+            <div>
+                <div class="message bot-msg">
+                    [SISTEMA INICIADO]<br>
+                    > Acceso concedido...<br>
+                    > Conexión establecida<br><br>
+                    ¡Hola! 👋 Soy tu asistente virtual de Linux. Estoy aquí para ayudarte con cualquier pregunta que tengas. ¿En qué puedo asistirte hoy?
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="loading" id="loading">
-      <div class="spinner"></div>
-      <p style="margin-top: 10px;">Pensando...</p>
+    <div class="input-area">
+        <div class="input-wrapper">
+            <input 
+                id="pregunta" 
+                type="text" 
+                placeholder="Ingresa tu comando..." 
+                onkeypress="if(event.key === 'Enter') enviar()" 
+            />
+        </div>
+        <button onclick="enviar()">
+            <span>EXEC</span>
+        </button>
     </div>
+</div>
 
-    <div class="input-container">
-      <div class="input-wrapper">
-        <input 
-          id="pregunta" 
-          placeholder="Escribe tu pregunta aquí..." 
-          onkeypress="handleKeyPress(event)"
-        >
-        <button onclick="send()" id="sendBtn">Enviar</button>
-      </div>
-    </div>
-  </div>
+<script>
+    // Matrix effect
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
 
-  <script>
-    const chatContainer = document.getElementById("chatContainer");
-    const loading = document.getElementById("loading");
-    const sendBtn = document.getElementById("sendBtn");
-    const preguntaInput = document.getElementById("pregunta");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-    function handleKeyPress(event) {
-      if (event.key === 'Enter') {
-        send();
-      }
+    const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+    const fontSize = 14;
+    const columns = canvas.width / fontSize;
+    const drops = Array(Math.floor(columns)).fill(1);
+
+    function drawMatrix() {
+        ctx.fillStyle = 'rgba(10, 14, 39, 0.05)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = '#00ff41';
+        ctx.font = fontSize + 'px monospace';
+
+        for (let i = 0; i < drops.length; i++) {
+            const text = chars[Math.floor(Math.random() * chars.length)];
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                drops[i] = 0;
+            }
+            drops[i]++;
+        }
     }
 
-    function addMessage(text, isUser) {
-      const emptyState = chatContainer.querySelector('.empty-state');
-      if (emptyState) {
-        emptyState.remove();
-      }
+    setInterval(drawMatrix, 50);
 
-      const messageDiv = document.createElement("div");
-      messageDiv.className = `message ${isUser ? 'user' : 'assistant'}`;
-      
-      messageDiv.innerHTML = `
-        <div class="message-label">${isUser ? '👤 Tú' : '🤖 Asistente'}</div>
-        <div class="message-content">${text}</div>
-      `;
-      
-      chatContainer.appendChild(messageDiv);
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-    }
+    window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    });
 
-    async function send() {
-      const pregunta = preguntaInput.value.trim();
-      
-      if (!pregunta) return;
+    // Chat functionality
+    const chat = document.getElementById("chat");
 
-      addMessage(pregunta, true);
-      preguntaInput.value = "";
-      
-      loading.classList.add('active');
-      sendBtn.disabled = true;
+    function agregarMensaje(texto, tipo) {
+        const fila = document.createElement("div");
+        fila.classList.add("message-row");
+        if (tipo === "user") fila.classList.add("user");
 
-      try {
-        const res = await fetch("http://192.168.0.109:5001/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ pregunta })
-        });
+        const burbuja = document.createElement("div");
+        burbuja.classList.add("message", tipo + "-msg");
+        burbuja.innerText = texto;
 
-        if (!res.ok) {
-          throw new Error('Error en la respuesta del servidor');
+        const avatar = document.createElement("div");
+        avatar.classList.add("avatar");
+        avatar.textContent = tipo === "user" ? "▶" : "⚡";
+
+        if (tipo === "user") {
+            fila.appendChild(burbuja);
+            fila.appendChild(avatar);
+        } else {
+            fila.appendChild(avatar);
+            fila.appendChild(burbuja);
         }
 
-        const data = await res.json();
-        addMessage(data.respuesta, false);
-      } catch (error) {
-        addMessage("Lo siento, hubo un error al procesar tu pregunta. Por favor, intenta de nuevo.", false);
-        console.error("Error:", error);
-      } finally {
-        loading.classList.remove('active');
-        sendBtn.disabled = false;
-        preguntaInput.focus();
-      }
+        chat.appendChild(fila);
+        chat.scrollTop = chat.scrollHeight;
     }
-  </script>
+
+    function mostrarEscribiendo() {
+        const filaTyping = document.createElement("div");
+        filaTyping.id = "typing";
+        filaTyping.classList.add("message-row");
+
+        const avatar = document.createElement("div");
+        avatar.classList.add("avatar");
+        avatar.textContent = "⚡";
+
+        const typing = document.createElement("div");
+        typing.classList.add("typing");
+        typing.innerHTML = `
+            <div class="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        `;
+
+        filaTyping.appendChild(avatar);
+        filaTyping.appendChild(typing);
+        chat.appendChild(filaTyping);
+        chat.scrollTop = chat.scrollHeight;
+    }
+
+    function ocultarEscribiendo() {
+        const escribir = document.getElementById("typing");
+        if (escribir) escribir.remove();
+    }
+
+    async function enviar() {
+        const input = document.getElementById("pregunta");
+        const texto = input.value.trim();
+        if (!texto) return;
+
+        agregarMensaje(texto, "user");
+        input.value = "";
+
+        mostrarEscribiendo();
+
+        try {
+            const res = await fetch("http://192.168.0.109:5001/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ pregunta: texto })
+            });
+
+            const data = await res.json();
+            ocultarEscribiendo();
+            agregarMensaje(data.respuesta, "bot");
+        } catch (error) {
+            ocultarEscribiendo();
+            agregarMensaje("[ERROR] Conexión perdida. Reintentando...", "bot");
+        }
+    }
+</script>
+
 </body>
 </html>

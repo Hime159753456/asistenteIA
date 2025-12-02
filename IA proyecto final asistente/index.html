@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Linubot - Terminal</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<canvas class="matrix-bg" id="matrix"></canvas>
+
+<div class="container">
+    <div class="scan-line"></div>
+    
+    <div class="header">
+        <div class="header-icon">⚡</div>
+        <div class="header-content">
+            <h1>LINUBOT</h1>
+            <p>SISTEMA OPERATIVO: LINUX v2.0</p>
+        </div>
+        <div class="status-indicator">
+            <div class="status-dot"></div>
+            <span>ONLINE</span>
+        </div>
+    </div>
+
+    <div class="chat-box" id="chat">
+        <div class="message-row">
+            <div class="avatar">⚡</div>
+            <div>
+                <div class="message bot-msg">
+                    [SISTEMA INICIADO]<br>
+                    > Acceso concedido...<br>
+                    > Conexión establecida<br><br>
+                    ¡Hola! 👋 Soy tu asistente virtual de Linux. Estoy aquí para ayudarte con cualquier pregunta que tengas. ¿En qué puedo asistirte hoy?
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="input-area">
+        <div class="input-wrapper">
+            <input 
+                id="pregunta" 
+                type="text" 
+                placeholder="Ingresa tu comando..." 
+                onkeypress="if(event.key === 'Enter') enviar()" 
+            />
+        </div>
+        <button onclick="enviar()">
+            <span>EXEC</span>
+        </button>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
