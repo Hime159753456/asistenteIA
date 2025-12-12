@@ -104,7 +104,7 @@ async function enviar() {
     mostrarEscribiendo();
     //Se hace el llamado a la API
     try {
-        const res = await fetch("http://192.168.0.109:5001/chat", {
+        const res = await fetch("https://overspeculative-kaycee-directorially.ngrok-free.dev/chat", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ pregunta: texto })
