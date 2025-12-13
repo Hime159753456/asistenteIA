@@ -9,6 +9,114 @@
   },
   {
     "keywords": ["wifi", "internet", "red"],
-    "respuesta": "Reinicia el router, verifica los controladores de red y verifica que el adaptador esté habilitado."
+    "respuesta": "Reinicia el router, verifica los controladores de red con 'lspci -k' y asegúrate de que el adaptador esté habilitado con 'ip link'."
+  },
+  {
+    "keywords": ["grub", "bootloader", "no arranca", "no bootea"],
+    "respuesta": "Si GRUB no arranca, inicia con un Live USB y ejecuta: 'sudo mount /dev/sdaX /mnt', 'sudo mount --bind /dev /mnt/dev', 'sudo mount --bind /proc /mnt/proc', 'sudo mount --bind /sys /mnt/sys', 'sudo chroot /mnt', 'grub-install /dev/sda', 'update-grub'."
+  },
+  {
+    "keywords": ["actualizar", "update", "upgrade"],
+    "respuesta": "Para actualizar el sistema: En Debian/Ubuntu usa 'sudo apt update && sudo apt upgrade'. En Fedora/RHEL usa 'sudo dnf update'. En Arch usa 'sudo pacman -Syu'."
+  },
+  {
+    "keywords": ["instalar programa", "install", "instalar paquete"],
+    "respuesta": "Para instalar software: Ubuntu/Debian 'sudo apt install nombre-paquete', Fedora 'sudo dnf install nombre-paquete', Arch 'sudo pacman -S nombre-paquete'."
+  },
+  {
+    "keywords": ["sonido", "audio", "no se oye", "sin audio"],
+    "respuesta": "Verifica el volumen con 'alsamixer', reinicia PulseAudio con 'pulseaudio -k' y 'pulseaudio --start', o verifica dispositivos con 'aplay -l'."
+  },
+  {
+    "keywords": ["disco lleno", "espacio", "storage", "sin espacio"],
+    "respuesta": "Verifica el espacio con 'df -h', encuentra archivos grandes con 'du -sh /* | sort -h', limpia paquetes con 'sudo apt autoremove' o 'sudo apt clean'."
+  },
+  {
+    "keywords": ["permisos", "permission denied", "acceso denegado"],
+    "respuesta": "Cambia permisos con 'chmod'. Por ejemplo: 'chmod +x archivo' para ejecutables, 'chmod 755 archivo' para directorios, 'sudo chown usuario:grupo archivo' para cambiar propietario."
+  },
+  {
+    "keywords": ["lento", "slow", "rendimiento", "performance"],
+    "respuesta": "Verifica procesos con 'top' o 'htop', revisa uso de disco con 'iotop', memoria con 'free -h', y servicios innecesarios con 'systemctl list-units --type=service'."
+  },
+  {
+    "keywords": ["usb", "pendrive", "no detecta usb"],
+    "respuesta": "Verifica con 'lsusb' si detecta el dispositivo, revisa 'dmesg | tail' para errores, y monta manualmente con 'sudo mount /dev/sdb1 /mnt'."
+  },
+  {
+    "keywords": ["contraseña", "password", "olvidé contraseña", "reset password"],
+    "respuesta": "Reinicia en modo recuperación (recovery mode) desde GRUB, monta en modo escritura con 'mount -o remount,rw /' y cambia la contraseña con 'passwd usuario'."
+  },
+  {
+    "keywords": ["kernel panic", "kernel", "error kernel"],
+    "respuesta": "Intenta arrancar con un kernel anterior desde GRUB. Revisa logs con 'journalctl -xb' una vez iniciado. Puede ser causado por drivers incompatibles o actualizaciones fallidas."
+  },
+  {
+    "keywords": ["drivers", "controladores", "driver nvidia", "driver amd"],
+    "respuesta": "Para NVIDIA: 'sudo ubuntu-drivers autoinstall' o instala manualmente desde repositorio. Para AMD, los drivers están incluidos en el kernel. Verifica con 'lspci -k | grep -A 3 VGA'."
+  },
+  {
+    "keywords": ["terminal", "consola", "bash", "comandos básicos"],
+    "respuesta": "Comandos básicos: 'ls' (listar), 'cd' (cambiar directorio), 'pwd' (directorio actual), 'cp' (copiar), 'mv' (mover), 'rm' (eliminar), 'mkdir' (crear carpeta), 'cat' (ver archivo)."
+  },
+  {
+    "keywords": ["firewall", "ufw", "iptables", "puerto"],
+    "respuesta": "Usa UFW: 'sudo ufw enable' para activar, 'sudo ufw allow puerto' para abrir puerto, 'sudo ufw status' para ver reglas. Para iptables: 'sudo iptables -L' lista reglas."
+  },
+  {
+    "keywords": ["ssh", "conexión remota", "acceso remoto"],
+    "respuesta": "Instala SSH: 'sudo apt install openssh-server'. Conéctate con 'ssh usuario@ip'. Verifica el servicio con 'sudo systemctl status sshd'. Puerto por defecto es 22."
+  },
+  {
+    "keywords": ["error", "fallo", "problema general"],
+    "respuesta": "Para diagnosticar errores usa: 'dmesg' (mensajes del kernel), 'journalctl -xe' (logs del sistema), 'systemctl status servicio' (estado de servicios)."
+  },
+  {
+    "keywords": ["impresora", "printer", "imprimir"],
+    "respuesta": "Instala CUPS: 'sudo apt install cups'. Accede a la interfaz en http://localhost:631. Agrega impresoras y verifica drivers con 'lpstat -p -d'."
+  },
+  {
+    "keywords": ["bluetooth", "no conecta bluetooth"],
+    "respuesta": "Verifica servicio: 'sudo systemctl status bluetooth'. Reinicia con 'sudo systemctl restart bluetooth'. Usa 'bluetoothctl' para emparejar dispositivos manualmente."
+  },
+  {
+    "keywords": ["particiones", "particionar", "gparted", "fdisk"],
+    "respuesta": "Usa 'gparted' (interfaz gráfica) o 'fdisk /dev/sda' (terminal). Lista particiones con 'lsblk' o 'fdisk -l'. Cuidado: particionar puede borrar datos."
+  },
+  {
+    "keywords": ["backup", "respaldo", "copia seguridad"],
+    "respuesta": "Usa 'rsync -av origen/ destino/' para respaldos, 'tar -czvf backup.tar.gz carpeta/' para comprimir, o herramientas como Timeshift para respaldos del sistema."
+  },
+  {
+    "keywords": ["virtualbox", "vm", "máquina virtual"],
+    "respuesta": "Instala VirtualBox: 'sudo apt install virtualbox'. Agrega tu usuario al grupo: 'sudo usermod -aG vboxusers $USER'. Reinicia sesión para aplicar cambios."
+  },
+  {
+    "keywords": ["docker", "contenedor", "container"],
+    "respuesta": "Instala Docker: 'curl -fsSL https://get.docker.com -o get-docker.sh && sh get-docker.sh'. Agrega usuario: 'sudo usermod -aG docker $USER'. Verifica: 'docker --version'."
+  },
+  {
+    "keywords": ["pantalla", "resolución", "display", "monitor"],
+    "respuesta": "Cambia resolución con 'xrandr' o desde configuración gráfica. Lista displays: 'xrandr -q'. Cambia: 'xrandr --output HDMI-1 --mode 1920x1080'."
+  },
+  {
+    "keywords": ["teclado", "idioma teclado", "layout"],
+    "respuesta": "Cambia layout temporalmente: 'setxkbmap es' (español) o 'setxkbmap us' (inglés). Permanente desde configuración del sistema o editando /etc/default/keyboard."
+  },
+  {
+    "keywords": ["mouse", "ratón", "touchpad", "trackpad"],
+    "respuesta": "Configura touchpad con 'xinput' o 'synclient'. Lista dispositivos: 'xinput list'. Desactiva touchpad: 'synclient TouchpadOff=1'. Activa: 'synclient TouchpadOff=0'."
+  },
+  {
+    "keywords": ["cpu", "temperatura", "sobrecalentamiento", "temp"],
+    "respuesta": "Verifica temperatura: 'sensors' (instala con 'sudo apt install lm-sensors', luego ejecuta 'sudo sensors-detect'). También usa 'htop' para ver carga de CPU."
+  },
+  {
+    "keywords": ["batería", "battery", "energía"],
+    "respuesta": "Verifica batería: 'upower -i /org/freedesktop/UPower/devices/battery_BAT0' o 'acpi -b'. Optimiza con TLP: 'sudo apt install tlp && sudo tlp start'."
+  },
+  {
+    "keywords": ["repositorio", "ppa", "sources"],
+    "respuesta": "Agrega PPA: 'sudo add-apt-repository ppa:nombre/ppa'. Elimina: 'sudo add-apt-repository --remove ppa:nombre/ppa'. Lista repos: 'cat /etc/apt/sources.list'."
   }
 ]
