@@ -15,7 +15,6 @@
   {"keywords": ["tearing", "screen tearing", "parpadeo pantalla"], "respuesta": "NVIDIA: ForceFullCompositionPipeline. AMD: habilita TearFree. Edita xorg.conf.d."},
   {"keywords": ["brillo", "brightness", "luz pantalla"], "respuesta": "'xrandr --output eDP-1 --brightness 0.8' o 'brightnessctl set 50%'."},
   {"keywords": ["hdmi", "no detecta hdmi", "hdmi sin señal"], "respuesta": "Activa salida: 'xrandr --output HDMI-1 --auto'. Revisa cable y puerto. Verifica audio HDMI."},
-
   {"keywords": ["wifi", "internet", "red", "no conecta wifi"], "respuesta": "Reinicia NetworkManager. 'nmcli dev wifi list' y conecta: 'nmcli dev wifi connect SSID password PASS'."},
   {"keywords": ["ethernet", "cable red", "lan"], "respuesta": "'ip link' para ver interfaz, 'sudo ip link set eth0 up', IP: 'sudo dhclient eth0'."},
   {"keywords": ["dns", "no resuelve", "resolución nombres"], "respuesta": "En NM: 'nmcli con mod NOMBRE ipv4.dns "8.8.8.8 8.8.4.4" ipv4.ignore-auto-dns yes' y reinicia conexión."},
@@ -139,7 +138,9 @@
   {"keywords": ["ntfs no monta", "fast startup", "windows hibernación"], "respuesta": "Desactiva Hibernación/Fast Startup en Windows; 'ntfsfix /dev/sdXN'."},
   {"keywords": ["permisos carpeta", "permission denied", "chown chmod"], "respuesta": "'sudo chown -R usuario:grupo /ruta'; 'chmod -R 755 /ruta' según necesidad."},
   {"keywords": ["cambiar hostname", "hostnamectl", "nombre equipo"], "respuesta": "'sudo hostnamectl set-hostname mi-equipo'; revisa /etc/hosts."},
+
   {"keywords": ["reiniciar nginx", "restart nginx", "nginx reload", "nginx servicio"], "respuesta": "Reiniciar: 'sudo systemctl restart nginx'. Recargar config: 'sudo systemctl reload nginx'. Probar sintaxis: 'sudo nginx -t'. Estado: 'systemctl status nginx'. Logs: '/var/log/nginx/*.log'."},
+  
   {"keywords": ["nginx habilitar sitio", "sites-available", "sites-enabled", "nginx site enable"], "respuesta": "Crea server block en /etc/nginx/sites-available/sitio; habilita: 'sudo ln -s /etc/nginx/sites-available/sitio /etc/nginx/sites-enabled/'; prueba 'nginx -t' y 'sudo systemctl reload nginx'."},
   {"keywords": ["https nginx", "let's encrypt", "certbot nginx"], "respuesta": "Instala: 'sudo apt install certbot python3-certbot-nginx'. Emite: 'sudo certbot --nginx -d ejemplo.com -d www.ejemplo.com'. Renovación automática con systemd timer de certbot."},
   {"keywords": ["reiniciar apache", "restart apache", "apache2"], "respuesta": "Reiniciar: 'sudo systemctl restart apache2'. Recargar: 'sudo systemctl reload apache2'. Estado: 'systemctl status apache2'. Logs: '/var/log/apache2/'."},
