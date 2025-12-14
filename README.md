@@ -74,3 +74,16 @@ Sugerencias para parametrizar:
 ## Licencia
 
 Define aquí la licencia del proyecto (MIT, Apache-2.0, etc.) si corresponde.
+
+## Flujo 
+
+-El usuario escribe en la UI (front/script.js).
+-Front envía POST JSON { pregunta: "..."} a /chat (actualmente hacia un dominio ngrok).
+-Backend (api.py) recibe, llama responder(mensaje).
+-responder (modelo.py):
+-Normaliza a minúsculas.
+-Detecta intención “Linux no arranca” por frases o palabras clave y activa modo diagnóstico(estado_usuario).
+-Si está en diagnóstico, espera respuestas “sí/no” y navega por diagnostico_boot (diagnosticos.py) -devolviendo soluciones_boot cuando corresponde.
+-Si no hay diagnóstico, busca coincidencias en base_conocimiento.json por keywords y devuelve la -respuesta asociada.
+-Si no encuentra, devuelve mensaje genérico invitando a diagnóstico.
+-API responde JSON {"respuesta": "..."} y el front lo muestra como mensaje del bot.

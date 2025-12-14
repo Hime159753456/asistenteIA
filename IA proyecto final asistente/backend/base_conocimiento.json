@@ -1,987 +1,154 @@
 [
-  {
-    "categoria": "Arranque del Sistema",
-    "keywords": ["no enciende", "no prende", "power", "no arranca"],
-    "respuesta": "Si el equipo no enciende, revisa el cable de corriente, la fuente de poder y prueba otro enchufe."
-  },
-  {
-    "categoria": "Arranque del Sistema",
-    "keywords": ["grub", "bootloader", "no bootea", "grub rescue"],
-    "respuesta": "Si GRUB no arranca, inicia con un Live USB y ejecuta: 'sudo mount /dev/sdaX /mnt', 'sudo mount --bind /dev /mnt/dev', 'sudo mount --bind /proc /mnt/proc', 'sudo mount --bind /sys /mnt/sys', 'sudo chroot /mnt', 'grub-install /dev/sda', 'update-grub'."
-  },
-  {
-    "categoria": "Arranque del Sistema",
-    "keywords": ["kernel panic", "kernel error", "panic kernel"],
-    "respuesta": "Intenta arrancar con un kernel anterior desde GRUB (opción Advanced Options). Revisa logs con 'journalctl -xb' una vez iniciado. Puede ser causado por drivers incompatibles o actualizaciones fallidas."
-  },
-  {
-    "categoria": "Arranque del Sistema",
-    "keywords": ["modo emergencia", "emergency mode", "maintenance mode"],
-    "respuesta": "Si arranca en modo emergencia, verifica el archivo /etc/fstab con 'cat /etc/fstab'. Comenta líneas problemáticas con '#'. Monta el sistema en modo escritura: 'mount -o remount,rw /'."
-  },
-  {
-    "categoria": "Arranque del Sistema",
-    "keywords": ["dual boot", "windows", "arranque dual"],
-    "respuesta": "Para reparar dual boot: actualiza GRUB con 'sudo update-grub'. Si Windows no aparece, instala os-prober: 'sudo apt install os-prober', luego 'sudo os-prober' y 'sudo update-grub'."
-  },
-  {
-    "categoria": "Arranque del Sistema",
-    "keywords": ["bootloop", "reinicio infinito", "loop arranque"],
-    "respuesta": "Si el sistema se reinicia constantemente, inicia en modo recuperación desde GRUB. Revisa logs: 'journalctl -xb -p err'. Puede ser problema de drivers gráficos, intenta con 'nomodeset' en parámetros de kernel."
-  },
-  {
-    "categoria": "Arranque del Sistema",
-    "keywords": ["initramfs", "busybox", "error initramfs"],
-    "respuesta": "En initramfs ejecuta 'fsck /dev/sdaX' para reparar sistema de archivos. Si hay errores de disco, ejecuta 'fsck -y /dev/sdaX'. Luego reinicia con 'reboot'."
-  },
-  {
-    "categoria": "Hardware - Video",
-    "keywords": ["pantalla negra", "no da imagen", "sin imagen", "black screen"],
-    "respuesta": "Puede ser problema de RAM o tarjeta de video. Prueba limpiando los módulos de RAM. Intenta arrancar con 'nomodeset' en GRUB (presiona 'e' en GRUB, agrega 'nomodeset' al final de la línea que inicia con 'linux')."
-  },
-  {
-    "categoria": "Hardware - Video",
-    "keywords": ["drivers", "controladores", "driver nvidia", "nvidia"],
-    "respuesta": "Para NVIDIA: 'sudo ubuntu-drivers autoinstall' o 'sudo apt install nvidia-driver-XXX'. Verifica con 'nvidia-smi'. Para instalar manualmente descarga de nvidia.com y ejecuta con 'sudo bash NVIDIA-Linux-xxx.run'."
-  },
-  {
-    "categoria": "Hardware - Video",
-    "keywords": ["driver amd", "amd", "radeon"],
-    "respuesta": "Los drivers AMD están incluidos en el kernel (AMDGPU). Verifica con 'lspci -k | grep -A 3 VGA'. Para rendimiento gaming instala mesa: 'sudo apt install mesa-vulkan-drivers'."
-  },
-  {
-    "categoria": "Hardware - Video",
-    "keywords": ["pantalla", "resolución", "display", "monitor"],
-    "respuesta": "Cambia resolución con 'xrandr'. Lista displays: 'xrandr -q'. Cambia: 'xrandr --output HDMI-1 --mode 1920x1080 --rate 60'. Para hacer permanente agrega a ~/.xprofile o usa configuración gráfica."
-  },
-  {
-    "categoria": "Hardware - Video",
-    "keywords": ["doble monitor", "dual monitor", "dos pantallas"],
-    "respuesta": "Configura con xrandr: 'xrandr --output HDMI-1 --auto --right-of eDP-1'. Opciones: --left-of, --right-of, --above, --below. Usa arandr (GUI) para facilitar: 'sudo apt install arandr'."
-  },
-  {
-    "categoria": "Hardware - Video",
-    "keywords": ["tearing", "screen tearing", "parpadeo pantalla"],
-    "respuesta": "Para NVIDIA crea /etc/X11/xorg.conf.d/20-nvidia.conf con: Section \"Screen\" Option \"metamodes\" \"nvidia-auto-select +0+0 {ForceFullCompositionPipeline=On}\" EndSection. Para AMD habilita TearFree en xorg.conf."
-  },
-  {
-    "categoria": "Hardware - Video",
-    "keywords": ["brillo", "brightness", "luz pantalla"],
-    "respuesta": "Ajusta brillo: 'xrandr --output eDP-1 --brightness 0.8' (0.0 a 1.0). O instala brightnessctl: 'sudo apt install brightnessctl', luego 'brightnessctl set 50%'. Verifica teclas Fn+F5/F6."
-  },
-  {
-    "categoria": "Hardware - Video",
-    "keywords": ["hdmi", "no detecta hdmi", "hdmi sin señal"],
-    "respuesta": "Verifica conexión con 'xrandr'. Activa salida: 'xrandr --output HDMI-1 --auto'. Revisa audio HDMI: 'pactl list sinks'. Si no detecta, prueba cable o puerto diferente."
-  },
-  {
-    "categoria": "Red e Internet",
-    "keywords": ["wifi", "internet", "red", "no conecta wifi"],
-    "respuesta": "Reinicia NetworkManager: 'sudo systemctl restart NetworkManager'. Verifica controladores: 'lspci -k | grep -i network'. Lista redes: 'nmcli dev wifi list'. Conecta: 'nmcli dev wifi connect SSID password PASSWORD'."
-  },
-  {
-    "categoria": "Red e Internet",
-    "keywords": ["ethernet", "cable red", "lan"],
-    "respuesta": "Verifica conexión: 'ip link'. Activa interfaz: 'sudo ip link set eth0 up'. Obtén IP: 'sudo dhclient eth0'. Verifica cable y LED del puerto ethernet."
-  },
-  {
-    "categoria": "Red e Internet",
-    "keywords": ["dns", "no resuelve", "resolución nombres"],
-    "respuesta": "Configura DNS en /etc/resolv.conf: 'nameserver 8.8.8.8' y 'nameserver 8.8.4.4'. Para NetworkManager edita conexión con 'nmcli con mod NOMBRE ipv4.dns \"8.8.8.8 8.8.4.4\"'."
-  },
-  {
-    "categoria": "Red e Internet",
-    "keywords": ["vpn", "openvpn", "wireguard"],
-    "respuesta": "OpenVPN: 'sudo apt install openvpn', luego 'sudo openvpn --config archivo.ovpn'. WireGuard: 'sudo apt install wireguard', configura en /etc/wireguard/wg0.conf, activa con 'sudo wg-quick up wg0'."
-  },
-  {
-    "categoria": "Red e Internet",
-    "keywords": ["firewall", "ufw", "iptables", "puerto"],
-    "respuesta": "UFW básico: 'sudo ufw enable', 'sudo ufw allow 22/tcp', 'sudo ufw status'. Para iptables: 'sudo iptables -L' lista reglas, 'sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT' abre puerto 80."
-  },
-  {
-    "categoria": "Red e Internet",
-    "keywords": ["ssh", "conexión remota", "acceso remoto"],
-    "respuesta": "Instala SSH: 'sudo apt install openssh-server'. Inicia servicio: 'sudo systemctl start sshd'. Conéctate: 'ssh usuario@ip'. Copia archivos: 'scp archivo usuario@ip:/ruta'. Puerto por defecto: 22."
-  },
-  {
-    "categoria": "Red e Internet",
-    "keywords": ["ip estática", "ip fija", "static ip"],
-    "respuesta": "Para NetworkManager: 'nmcli con mod NOMBRE ipv4.addresses 192.168.1.100/24 ipv4.gateway 192.168.1.1 ipv4.dns 8.8.8.8 ipv4.method manual'. Reinicia conexión: 'nmcli con down NOMBRE && nmcli con up NOMBRE'."
-  },
-  {
-    "categoria": "Red e Internet",
-    "keywords": ["ping", "traceroute", "diagnóstico red"],
-    "respuesta": "Prueba conectividad: 'ping 8.8.8.8' o 'ping google.com'. Traza ruta: 'traceroute google.com'. Verifica puertos: 'netstat -tuln' o 'ss -tuln'. Escanea red: 'nmap 192.168.1.0/24'."
-  },
-  {
-    "categoria": "Red e Internet",
-    "keywords": ["samba", "compartir archivos", "windows compartir"],
-    "respuesta": "Instala Samba: 'sudo apt install samba'. Configura en /etc/samba/smb.conf. Agrega usuario: 'sudo smbpasswd -a usuario'. Accede desde Windows: \\\\ip-linux\\carpeta."
-  },
-  {
-    "categoria": "Red e Internet",
-    "keywords": ["nfs", "compartir linux", "montaje red"],
-    "respuesta": "Servidor NFS: 'sudo apt install nfs-kernel-server'. Configura en /etc/exports: '/carpeta 192.168.1.0/24(rw,sync)'. Cliente: 'sudo mount -t nfs 192.168.1.100:/carpeta /mnt'."
-  },
-  {
-    "categoria": "Audio",
-    "keywords": ["sonido", "audio", "no se oye", "sin audio"],
-    "respuesta": "Verifica volumen: 'alsamixer'. Reinicia PulseAudio: 'pulseaudio -k && pulseaudio --start'. Lista dispositivos: 'aplay -l'. Selecciona salida: 'pactl set-default-sink NOMBRE'. Verifica con: 'speaker-test -c 2'."
-  },
-  {
-    "categoria": "Audio",
-    "keywords": ["micrófono", "micro", "no graba"],
-    "respuesta": "Verifica dispositivos de entrada: 'arecord -l'. Configura con 'alsamixer' (presiona F4 para capture). Prueba grabación: 'arecord -d 5 test.wav' luego 'aplay test.wav'. Ajusta nivel: 'pactl set-source-volume @DEFAULT_SOURCE@ 80%'."
-  },
-  {
-    "categoria": "Audio",
-    "keywords": ["hdmi audio", "sonido hdmi", "audio monitor"],
-    "respuesta": "Lista salidas: 'pactl list sinks short'. Cambia a HDMI: 'pactl set-default-sink NOMBRE_HDMI'. Si no aparece, verifica: 'aplay -l'. Puede requerir configurar audio en monitor físicamente."
-  },
-  {
-    "categoria": "Audio",
-    "keywords": ["bluetooth audio", "audífonos bluetooth", "headset"],
-    "respuesta": "Instala: 'sudo apt install pulseaudio-module-bluetooth bluez'. Reinicia bluetooth: 'sudo systemctl restart bluetooth'. Empareja: 'bluetoothctl', luego 'scan on', 'pair MAC', 'connect MAC', 'trust MAC'."
-  },
-  {
-    "categoria": "Audio",
-    "keywords": ["audio crackling", "audio entrecortado", "ruido audio"],
-    "respuesta": "Edita /etc/pulse/default.pa, cambia 'load-module module-udev-detect' a 'load-module module-udev-detect tsched=0'. Reinicia PulseAudio. O prueba: 'echo 'options snd-hda-intel model=auto' | sudo tee -a /etc/modprobe.d/alsa-base.conf'."
-  },
-  {
-    "categoria": "Almacenamiento",
-    "keywords": ["disco lleno", "espacio", "storage", "sin espacio"],
-    "respuesta": "Verifica espacio: 'df -h'. Encuentra archivos grandes: 'du -sh /* 2>/dev/null | sort -h'. Limpia paquetes: 'sudo apt autoremove && sudo apt clean'. Limpia journalctl: 'sudo journalctl --vacuum-time=7d'."
-  },
-  {
-    "categoria": "Almacenamiento",
-    "keywords": ["disco duro", "hdd", "smart", "salud disco"],
-    "respuesta": "Instala smartmontools: 'sudo apt install smartmontools'. Verifica salud: 'sudo smartctl -H /dev/sda'. Info completa: 'sudo smartctl -a /dev/sda'. Prueba: 'sudo smartctl -t short /dev/sda'."
-  },
-  {
-    "categoria": "Almacenamiento",
-    "keywords": ["ssd", "trim", "optimizar ssd"],
-    "respuesta": "Verifica TRIM: 'sudo fstrim -v /'. Habilita automático: 'sudo systemctl enable fstrim.timer'. Verifica soporte: 'lsblk -D' (valor DISC-GRAN > 0). En /etc/fstab agrega opción 'discard' (no recomendado para algunos SSD antiguos)."
-  },
-  {
-    "categoria": "Almacenamiento",
-    "keywords": ["particiones", "particionar", "gparted", "fdisk"],
-    "respuesta": "GUI: 'sudo apt install gparted && sudo gparted'. Terminal: 'sudo fdisk /dev/sda' (sigue prompts: m=ayuda, n=nueva, d=eliminar, w=escribir). Lista particiones: 'lsblk' o 'sudo fdisk -l'. CUIDADO: Particionar puede borrar datos."
-  },
-  {
-    "categoria": "Almacenamiento",
-    "keywords": ["formatear", "format", "mkfs"],
-    "respuesta": "EXT4: 'sudo mkfs.ext4 /dev/sdXN'. NTFS: 'sudo mkfs.ntfs /dev/sdXN'. FAT32: 'sudo mkfs.vfat -F 32 /dev/sdXN'. Esto BORRA todos los datos de la partición. Verifica que /dev/sdXN sea correcto."
-  },
-  {
-    "categoria": "Almacenamiento",
-    "keywords": ["montar", "mount", "umount", "desmontar"],
-    "respuesta": "Montar: 'sudo mount /dev/sdXN /mnt'. Desmontar: 'sudo umount /mnt'. Montar automático: agrega a /etc/fstab: '/dev/sdXN /punto/montaje ext4 defaults 0 2'. Prueba fstab: 'sudo mount -a'."
-  },
-  {
-    "categoria": "Almacenamiento",
-    "keywords": ["usb", "pendrive", "no detecta usb"],
-    "respuesta": "Verifica detección: 'lsusb'. Mensajes kernel: 'dmesg | tail -20'. Lista dispositivos: 'lsblk'. Monta: 'sudo mount /dev/sdb1 /mnt'. Si no aparece, prueba otro puerto USB o verifica el pendrive en otro equipo."
-  },
-  {
-    "categoria": "Almacenamiento",
-    "keywords": ["disco externo", "hdd externo", "external drive"],
-    "respuesta": "Conecta y ejecuta 'lsblk' para identificar (ej: sdb). Monta: 'sudo mount /dev/sdb1 /mnt'. Para NTFS instala: 'sudo apt install ntfs-3g'. Desmonta antes de desconectar: 'sudo umount /mnt'."
-  },
-  {
-    "categoria": "Almacenamiento",
-    "keywords": ["raid", "mdadm", "raid linux"],
-    "respuesta": "Instala: 'sudo apt install mdadm'. Crea RAID1: 'sudo mdadm --create /dev/md0 --level=1 --raid-devices=2 /dev/sda1 /dev/sdb1'. Verifica: 'cat /proc/mdstat'. Guarda config: 'sudo mdadm --detail --scan | sudo tee -a /etc/mdadm/mdadm.conf'."
-  },
-  {
-    "categoria": "Almacenamiento",
-    "keywords": ["lvm", "logical volume", "volumen lógico"],
-    "respuesta": "Ver volúmenes: 'sudo lvdisplay'. Extender: 'sudo lvextend -L +10G /dev/vg/lv' luego 'sudo resize2fs /dev/vg/lv'. Crear: 'sudo lvcreate -L 20G -n nombre vg'. Reducir: primero 'resize2fs' luego 'lvreduce'."
-  },
-  {
-    "categoria": "Gestión de Paquetes",
-    "keywords": ["actualizar", "update", "upgrade", "actualización"],
-    "respuesta": "Debian/Ubuntu: 'sudo apt update && sudo apt upgrade'. Fedora/RHEL: 'sudo dnf update'. Arch: 'sudo pacman -Syu'. OpenSUSE: 'sudo zypper update'. Actualización completa Ubuntu: 'sudo apt dist-upgrade'."
-  },
-  {
-    "categoria": "Gestión de Paquetes",
-    "keywords": ["instalar programa", "install", "instalar paquete"],
-    "respuesta": "Ubuntu/Debian: 'sudo apt install paquete'. Fedora: 'sudo dnf install paquete'. Arch: 'sudo pacman -S paquete'. OpenSUSE: 'sudo zypper install paquete'. Buscar paquete: 'apt search nombre'."
-  },
-  {
-    "categoria": "Gestión de Paquetes",
-    "keywords": ["desinstalar", "remove", "eliminar programa"],
-    "respuesta": "Ubuntu/Debian: 'sudo apt remove paquete' (deja configs) o 'sudo apt purge paquete' (elimina todo). Fedora: 'sudo dnf remove paquete'. Arch: 'sudo pacman -R paquete' o 'pacman -Rns paquete' (con dependencias)."
-  },
-  {
-    "categoria": "Gestión de Paquetes",
-    "keywords": ["repositorio", "ppa", "sources", "repo"],
-    "respuesta": "Agregar PPA (Ubuntu): 'sudo add-apt-repository ppa:nombre/ppa'. Eliminar: 'sudo add-apt-repository --remove ppa:nombre/ppa'. Lista repos: 'cat /etc/apt/sources.list' y 'ls /etc/apt/sources.list.d/'."
-  },
-  {
-    "categoria": "Gestión de Paquetes",
-    "keywords": ["snap", "snapcraft", "paquetes snap"],
-    "respuesta": "Instala: 'sudo snap install paquete'. Lista instalados: 'snap list'. Actualiza: 'sudo snap refresh'. Elimina: 'sudo snap remove paquete'. Busca: 'snap find nombre'."
-  },
-  {
-    "categoria": "Gestión de Paquetes",
-    "keywords": ["flatpak", "flathub"],
-    "respuesta": "Instala Flatpak: 'sudo apt install flatpak'. Agrega Flathub: 'flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo'. Instala app: 'flatpak install flathub nombre.app'."
-  },
-  {
-    "categoria": "Gestión de Paquetes",
-    "keywords": ["appimage", "aplicación portable"],
-    "respuesta": "Dale permisos de ejecución: 'chmod +x archivo.AppImage'. Ejecuta: './archivo.AppImage'. Para integrar al menú instala: 'sudo apt install libfuse2'. Opcional: usa AppImageLauncher para mejor integración."
-  },
-  {
-    "categoria": "Gestión de Paquetes",
-    "keywords": ["dependencias", "dependencies", "librerías"],
-    "respuesta": "Instala dependencias faltantes: 'sudo apt install -f'. Lista dependencias de un paquete: 'apt-cache depends paquete'. Dependencias reversas: 'apt-cache rdepends paquete'. Arregla broken: 'sudo dpkg --configure -a'."
-  },
-  {
-    "categoria": "Gestión de Paquetes",
-    "keywords": ["compilar", "source", "make", "cmake"],
-    "respuesta": "Pasos básicos: 1) Instala herramientas: 'sudo apt install build-essential'. 2) Descarga código fuente. 3) Descomprime: 'tar -xzvf archivo.tar.gz'. 4) 'cd carpeta && ./configure && make && sudo make install'. Lee README/INSTALL."
-  },
-  {
-    "categoria": "Sistema y Rendimiento",
-    "keywords": ["lento", "slow", "rendimiento", "performance"],
-    "respuesta": "Verifica procesos: 'htop' (instala con 'sudo apt install htop'). CPU: 'top'. Memoria: 'free -h'. Disco: 'iotop'. Servicios: 'systemctl list-units --type=service --state=running'. Desactiva servicios innecesarios: 'sudo systemctl disable nombre'."
-  },
-  {
-    "categoria": "Sistema y Rendimiento",
-    "keywords": ["cpu", "procesador", "uso cpu"],
-    "respuesta": "Ver uso: 'top' o 'htop'. Info CPU: 'lscpu' o 'cat /proc/cpuinfo'. Por proceso: 'ps aux --sort=-%cpu | head'. Frecuencia: 'watch -n 1 cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq'."
-  },
-  {
-    "categoria": "Sistema y Rendimiento",
-    "keywords": ["ram", "memoria", "memory", "swap"],
-    "respuesta": "Ver uso: 'free -h'. Detallado: 'vmstat' o 'cat /proc/meminfo'. Por proceso: 'ps aux --sort=-%mem | head'. Liberar cache: 'sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches'."
-  },
-  {
-    "categoria": "Sistema y Rendimiento",
-    "keywords": ["swap", "archivo intercambio", "swapfile"],
-    "respuesta": "Ver swap: 'swapon --show'. Crear swapfile: 'sudo fallocate -l 4G /swapfile', 'sudo chmod 600 /swapfile', 'sudo mkswap /swapfile', 'sudo swapon /swapfile'. Permanente: agrega '/swapfile none swap sw 0 0' a /etc/fstab."
-  },
-  {
-    "categoria": "Sistema y Rendimiento",
-    "keywords": ["temperatura", "temp", "sobrecalentamiento", "sensors"],
-    "respuesta": "Instala: 'sudo apt install lm-sensors'. Detecta: 'sudo sensors-detect' (responde YES a todo). Ver temperatura: 'sensors'. Continuo: 'watch -n 2 sensors'. Para laptops instala: 'sudo apt install psensor' (GUI)."
-  },
-  {
-    "categoria": "Sistema y Rendimiento",
-    "keywords": ["ventilador", "fan", "cooler"],
-    "respuesta": "Ver RPM: 'sensors'. Control manual: 'sudo apt install fancontrol', luego 'sudo pwmconfig'. Alternativa: 'sudo apt install i8kutils' (Dell) o 'thinkfan' (Lenovo). Cuidado: configuración incorrecta puede dañar hardware."
-  },
-  {
-    "categoria": "Sistema y Rendimiento",
-    "keywords": ["procesos", "process", "matar proceso", "kill"],
-    "respuesta": "Lista procesos: 'ps aux' o 'htop'. Matar proceso: 'kill PID' o 'kill -9 PID' (forzar). Por nombre: 'pkill nombre' o 'killall nombre'. Procesos zombies: 'ps aux | grep defunct'."
-  },
-  {
-    "categoria": "Sistema y Rendimiento",
-    "keywords": ["servicios", "services", "systemd", "daemon"],
-    "respuesta": "Lista servicios: 'systemctl list-units --type=service'. Estado: 'systemctl status nombre'. Iniciar: 'sudo systemctl start nombre'. Detener: 'sudo systemctl stop nombre'. Habilitar arranque: 'sudo systemctl enable nombre'."
-  },
-  {
-    "categoria": "Sistema y Rendimiento",
-    "keywords": ["cron", "tarea programada", "automatizar"],
-    "respuesta": "Edita cron: 'crontab -e'. Formato: 'minuto hora día mes díasemana comando'. Ejemplo: '0 2 * * * /ruta/script.sh' (diario 2am). Lista tareas: 'crontab -l'. Sistema: edita /etc/crontab o crea archivo en /etc/cron.d/."
-  },
-  {
-    "categoria": "Sistema y Rendimiento",
-    "keywords": ["logs", "registros", "journalctl"],
-    "respuesta": "Ver logs: 'journalctl -xe' (últimos con errores). Desde boot: 'journalctl -b'. Servicio específico: 'journalctl -u nombre'. Tiempo real: 'journalctl -f'. Limpiar: 'sudo journalctl --vacuum-time=7d' (más viejos que 7 días)."
-  },
-  {
-    "categoria": "Seguridad",
-    "keywords": ["contraseña", "password", "olvidé contraseña", "reset password"],
-    "respuesta": "Reinicia en recovery mode desde GRUB. Remonta sistema: 'mount -o remount,rw /'. Cambia password: 'passwd usuario'. Si no hay recovery, usa Live USB, monta partición root y ejecuta 'chroot /mnt' antes de 'passwd'."
-  },
-  {
-    "categoria": "Seguridad",
-    "keywords": ["sudo", "permisos root", "sudoers"],
-    "respuesta": "Agregar usuario a sudo: 'sudo usermod -aG sudo usuario'. Editar sudoers: 'sudo visudo'. Usuario sin password: agrega 'usuario ALL=(ALL) NOPASSWD:ALL'. Ejecutar comando como root: 'sudo comando'."
-  },
-  {
-    "categoria": "Seguridad",
-    "keywords": ["permisos", "permission denied", "chmod", "chown"],
-    "respuesta": "Ver permisos: 'ls -l'. Cambiar permisos: 'chmod 755 archivo' (rwxr-xr-x). Ejecutable: 'chmod +x archivo'. Recursivo: 'chmod -R 755 carpeta'. Cambiar dueño: 'sudo chown usuario:grupo archivo'. Recursivo: 'chown -R'."
-  },
-  {
-    "categoria": "Seguridad",
-    "keywords": ["antivirus", "virus", "malware", "clamav"],
-    "respuesta": "Instala ClamAV: 'sudo apt install clamav clamav-daemon'. Actualiza: 'sudo freshclam'. Escanea: 'clamscan -r /home'. Interfaz gráfica: 'sudo apt install clamtk'. Linux tiene menos malware pero no es inmune."
-  },
-  {
-    "categoria": "Seguridad",
-    "keywords": ["fail2ban", "seguridad ssh", "proteger ssh"],
-    "respuesta": "Instala: 'sudo apt install fail2ban'. Configura: 'sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local'. Edita jail.local, habilita [sshd]. Inicia: 'sudo systemctl start fail2ban'. Estado: 'sudo fail2ban-client status sshd'."
-  },
-  {
-    "categoria": "Seguridad",
-    "keywords": ["encriptar", "cifrar", "encryption", "luks"],
-    "respuesta": "Encriptar partición (BORRA DATOS): 'sudo cryptsetup luksFormat /dev/sdXN'. Abrir: 'sudo cryptsetup open /dev/sdXN nombre'. Formatea: 'sudo mkfs.ext4 /dev/mapper/nombre'. Cierra: 'sudo cryptsetup close nombre'."
-  },
-  {
-    "categoria": "Seguridad",
-    "keywords": ["selinux", "apparmor", "seguridad obligatoria"],
-    "respuesta": "SELinux (Fedora/RHEL): Estado: 'sestatus'. Modo: 'sudo setenforce 0' (permissive) o '1' (enforcing). AppArmor (Ubuntu): Estado: 'sudo aa-status'. Desactiva perfil: 'sudo aa-disable /etc/apparmor.d/perfil'."
-  },
-  {
-    "categoria": "Usuarios y Grupos",
-    "keywords": ["crear usuario", "new user", "adduser"],
-    "respuesta": "Crear usuario: 'sudo adduser nombre' o 'sudo useradd -m -s /bin/bash nombre'. Establecer password: 'sudo passwd nombre'. Eliminar: 'sudo deluser nombre' o 'sudo userdel -r nombre' (con home)."
-  },
-  {
-    "categoria": "Usuarios y Grupos",
-    "keywords": ["crear usuario", "new user", "adduser"],
-    "respuesta": "Crear usuario: 'sudo adduser nombre' o 'sudo useradd -m -s /bin/bash nombre'. Establecer password: 'sudo passwd nombre'. Eliminar: 'sudo deluser nombre' o 'sudo userdel -r nombre' (con home)."
-  },
-  {
-    "categoria": "Usuarios y Grupos",
-    "keywords": ["grupos", "groups", "agregar grupo"],
-    "respuesta": "Crear grupo: 'sudo groupadd nombre'. Agregar usuario a grupo: 'sudo usermod -aG grupo usuario'. Ver grupos de usuario: 'groups usuario'. Eliminar grupo: 'sudo groupdel nombre'. Lista todos los grupos: 'cat /etc/group'."
-  },
-  {
-    "categoria": "Usuarios y Grupos",
-    "keywords": ["cambiar usuario", "switch user", "su"],
-    "respuesta": "Cambiar a otro usuario: 'su - usuario'. Cambiar a root: 'su -' o 'sudo -i'. Ejecutar comando como usuario: 'sudo -u usuario comando'. Salir: 'exit'."
-  },
-  {
-    "categoria": "Usuarios y Grupos",
-    "keywords": ["login automático", "autologin", "inicio sesión"],
-    "respuesta": "Para GDM (GNOME): edita /etc/gdm3/custom.conf, en [daemon] agrega: 'AutomaticLoginEnable=true' y 'AutomaticLogin=usuario'. Para LightDM: edita /etc/lightdm/lightdm.conf: 'autologin-user=usuario'."
-  },
-  {
-    "categoria": "Usuarios y Grupos",
-    "keywords": ["bloquear usuario", "lock user", "deshabilitar"],
-    "respuesta": "Bloquear: 'sudo passwd -l usuario' o 'sudo usermod -L usuario'. Desbloquear: 'sudo passwd -u usuario' o 'sudo usermod -U usuario'. Verificar: 'sudo passwd -S usuario'."
-  },
-  {
-    "categoria": "Usuarios y Grupos",
-    "keywords": ["home directory", "directorio personal", "crear home"],
-    "respuesta": "Crear usuario con home: 'sudo useradd -m usuario'. Si ya existe sin home: 'sudo mkhomedir_helper usuario' o manual: 'sudo mkdir /home/usuario && sudo chown usuario:usuario /home/usuario'."
-  },
-  {
-    "categoria": "Usuarios y Grupos",
-    "keywords": ["cambiar shell", "bash", "zsh", "shell usuario"],
-    "respuesta": "Ver shell actual: 'echo $SHELL'. Cambiar shell: 'chsh -s /bin/bash' o 'chsh -s /bin/zsh'. Requiere relogin. Lista shells disponibles: 'cat /etc/shells'. Para otro usuario: 'sudo chsh -s /bin/bash usuario'."
-  },
-  {
-    "categoria": "Escritorio y Entorno Gráfico",
-    "keywords": ["escritorio", "desktop", "gnome", "kde", "xfce"],
-    "respuesta": "Instalar GNOME: 'sudo apt install gnome-shell'. KDE: 'sudo apt install kde-plasma-desktop'. XFCE: 'sudo apt install xfce4'. Cambiar en login screen. Eliminar: 'sudo apt remove --purge nombre-escritorio'."
-  },
-  {
-    "categoria": "Escritorio y Entorno Gráfico",
-    "keywords": ["pantalla de login", "display manager", "gdm", "lightdm"],
-    "respuesta": "Ver actual: 'cat /etc/X11/default-display-manager'. Cambiar: 'sudo dpkg-reconfigure gdm3' o 'lightdm'. Reiniciar DM: 'sudo systemctl restart gdm' o 'lightdm'."
-  },
-  {
-    "categoria": "Escritorio y Entorno Gráfico",
-    "keywords": ["wayland", "x11", "xorg"],
-    "respuesta": "Ver sesión actual: 'echo $XDG_SESSION_TYPE'. Cambiar a X11: en login screen selecciona sesión X11/Xorg. Forzar X11: edita /etc/gdm3/custom.conf, descomenta 'WaylandEnable=false'."
-  },
-  {
-    "categoria": "Escritorio y Entorno Gráfico",
-    "keywords": ["tema", "theme", "iconos", "apariencia"],
-    "respuesta": "Temas en: ~/.themes o /usr/share/themes. Iconos: ~/.icons o /usr/share/icons. Aplicar con gnome-tweaks: 'sudo apt install gnome-tweaks'. Descarga temas de: gnome-look.org o pling.com."
-  },
-  {
-    "categoria": "Escritorio y Entorno Gráfico",
-    "keywords": ["fuentes", "fonts", "tipografía"],
-    "respuesta": "Instalar fuentes: copia .ttf o .otf a ~/.fonts o /usr/share/fonts/. Actualiza cache: 'fc-cache -fv'. Lista fuentes: 'fc-list'. Manager gráfico: 'sudo apt install font-manager'."
-  },
-  {
-    "categoria": "Escritorio y Entorno Gráfico",
-    "keywords": ["teclado", "idioma teclado", "layout", "distribución"],
-    "respuesta": "Temporal: 'setxkbmap es' o 'setxkbmap us'. Ver actual: 'setxkbmap -query'. Permanente: desde configuración del sistema o edita /etc/default/keyboard: 'XKBLAYOUT=\"es\"'."
-  },
-  {
-    "categoria": "Escritorio y Entorno Gráfico",
-    "keywords": ["atajos", "shortcuts", "hotkeys", "teclas"],
-    "respuesta": "Ver atajos: Configuración > Teclado > Atajos. Terminal: 'gsettings list-recursively org.gnome.desktop.wm.keybindings'. Crear atajo: 'gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/path/ binding \"<Super>t\"'."
-  },
-  {
-    "categoria": "Escritorio y Entorno Gráfico",
-    "keywords": ["mouse", "ratón", "touchpad", "trackpad"],
-    "respuesta": "Configurar touchpad: 'xinput list' para ver dispositivos. Propiedades: 'xinput list-props ID'. Desactivar: 'xinput disable ID'. Synclient: 'synclient TouchpadOff=1'. Permanente: crea /etc/X11/xorg.conf.d/30-touchpad.conf."
-  },
-  {
-    "categoria": "Escritorio y Entorno Gráfico",
-    "keywords": ["cursor", "puntero", "tamaño cursor"],
-    "respuesta": "Cambiar tamaño: 'gsettings set org.gnome.desktop.interface cursor-size 48'. Tema cursor: 'gsettings set org.gnome.desktop.interface cursor-theme nombre'. Cursores en /usr/share/icons/."
-  },
-  {
-    "categoria": "Escritorio y Entorno Gráfico",
-    "keywords": ["composición", "compositor", "picom", "compton"],
-    "respuesta": "Instalar picom: 'sudo apt install picom'. Configurar: 'mkdir -p ~/.config/picom && picom --config ~/.config/picom/picom.conf'. Autostart: agrega 'picom -b' a ~/.xinitrc o autostart de DE."
-  },
-  {
-    "categoria": "Dispositivos Periféricos",
-    "keywords": ["impresora", "printer", "imprimir", "cups"],
-    "respuesta": "Instala CUPS: 'sudo apt install cups'. Inicia servicio: 'sudo systemctl start cups'. Interfaz web: http://localhost:631. Agrega impresora desde ahí. Verifica: 'lpstat -p -d'. Drivers: 'sudo apt install printer-driver-all'."
-  },
-  {
-    "categoria": "Dispositivos Periféricos",
-    "keywords": ["escáner", "scanner", "escanear"],
-    "respuesta": "Instala SANE: 'sudo apt install sane sane-utils xsane'. Detecta escáner: 'scanimage -L'. Escanea: 'scanimage --format=png > imagen.png'. GUI: 'xsane' o 'simple-scan'."
-  },
-  {
-    "categoria": "Dispositivos Periféricos",
-    "keywords": ["bluetooth", "no conecta bluetooth", "bt"],
-    "respuesta": "Verifica servicio: 'sudo systemctl status bluetooth'. Reinicia: 'sudo systemctl restart bluetooth'. Usar bluetoothctl: 'bluetoothctl', luego 'power on', 'scan on', 'pair MAC', 'connect MAC', 'trust MAC'."
-  },
-  {
-    "categoria": "Dispositivos Periféricos",
-    "keywords": ["webcam", "cámara", "no funciona cámara"],
-    "respuesta": "Verifica: 'ls /dev/video*'. Prueba: 'sudo apt install cheese' luego ejecuta 'cheese'. O con ffplay: 'ffplay /dev/video0'. Permisos: 'sudo usermod -aG video $USER' (relogin necesario)."
-  },
-  {
-    "categoria": "Dispositivos Periféricos",
-    "keywords": ["gamepad", "joystick", "mando", "control"],
-    "respuesta": "Verifica: 'ls /dev/input/js*'. Prueba: 'sudo apt install jstest-gtk' luego 'jstest-gtk'. Calibra: 'jscal /dev/input/js0'. Para juegos Steam: habilita Steam Input en configuración."
-  },
-  {
-    "categoria": "Dispositivos Periféricos",
-    "keywords": ["wacom", "tableta gráfica", "tablet"],
-    "respuesta": "Instala drivers: 'sudo apt install xserver-xorg-input-wacom'. Verifica: 'xsetwacom --list devices'. Configuración: 'xsetwacom set \"device\" Area x1 y1 x2 y2'. GUI: 'sudo apt install kde-config-tablet'."
-  },
-  {
-    "categoria": "Energía y Batería",
-    "keywords": ["batería", "battery", "energía"],
-    "respuesta": "Ver info: 'upower -i /org/freedesktop/UPower/devices/battery_BAT0' o 'acpi -b'. Detallado: 'cat /sys/class/power_supply/BAT0/uevent'. Calibrar: descarga completamente, luego carga al 100% sin interrupciones."
-  },
-  {
-    "categoria": "Energía y Batería",
-    "keywords": ["tlp", "optimizar batería", "ahorro energía"],
-    "respuesta": "Instala TLP: 'sudo apt install tlp tlp-rdw'. Inicia: 'sudo tlp start'. Ver estado: 'sudo tlp-stat'. Configuración avanzada: edita /etc/tlp.conf. Para ThinkPads instala: 'sudo apt install tp-smapi-dkms acpi-call-dkms'."
-  },
-  {
-    "categoria": "Energía y Batería",
-    "keywords": ["suspender", "suspend", "hibernar", "hibernate"],
-    "respuesta": "Suspender: 'systemctl suspend'. Hibernar: 'systemctl hibernate'. Hybrid: 'systemctl hybrid-sleep'. Si no funciona verifica swap y configura en /etc/systemd/logind.conf: 'HandleLidSwitch=suspend'."
-  },
-  {
-    "categoria": "Energía y Batería",
-    "keywords": ["pantalla se apaga", "screensaver", "protector pantalla"],
-    "respuesta": "Desactivar: 'xset s off && xset -dpms'. Activar: 'xset s on && xset +dpms'. Tiempo: 'xset s 600' (10 min). GNOME: 'gsettings set org.gnome.desktop.session idle-delay 0'. Permanente: agrega a ~/.xinitrc."
-  },
-  {
-    "categoria": "Virtualización",
-    "keywords": ["virtualbox", "vm", "máquina virtual"],
-    "respuesta": "Instala: 'sudo apt install virtualbox virtualbox-ext-pack'. Agrega usuario: 'sudo usermod -aG vboxusers $USER'. Reinicia sesión. Extension Pack desde: virtualbox.org/wiki/Downloads. Guest Additions: Devices > Insert Guest Additions CD."
-  },
-  {
-    "categoria": "Virtualización",
-    "keywords": ["kvm", "qemu", "virt-manager"],
-    "respuesta": "Instala: 'sudo apt install qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virt-manager'. Agrega usuario: 'sudo usermod -aG libvirt $USER'. Verifica: 'virsh list --all'. GUI: ejecuta 'virt-manager'."
-  },
-  {
-    "categoria": "Virtualización",
-    "keywords": ["docker", "contenedor", "container"],
-    "respuesta": "Instala: 'curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh'. Agrega usuario: 'sudo usermod -aG docker $USER'. Relogin. Verifica: 'docker run hello-world'. Compose: 'sudo apt install docker-compose'."
-  },
-  {
-    "categoria": "Virtualización",
-    "keywords": ["wine", "windows", "ejecutar exe"],
-    "respuesta": "Instala Wine: 'sudo dpkg --add-architecture i386 && sudo apt update && sudo apt install wine64 wine32'. Ejecuta: 'wine programa.exe'. Config: 'winecfg'. PlayOnLinux (GUI): 'sudo apt install playonlinux'."
-  },
-  {
-    "categoria": "Virtualización",
-    "keywords": ["wsl", "linux en windows", "subsistema"],
-    "respuesta": "WSL es Windows Subsystem for Linux (Linux en Windows, no al revés). Para ejecutar Windows en Linux usa VirtualBox, KVM, o Wine. Para apps Windows en Linux: Wine, Bottles, o Proton (Steam)."
-  },
-  {
-    "categoria": "Desarrollo",
-    "keywords": ["git", "github", "control versiones"],
-    "respuesta": "Instala: 'sudo apt install git'. Config: 'git config --global user.name \"Nombre\"' y 'git config --global user.email \"email@ejemplo.com\"'. Clonar: 'git clone url'. Comandos: add, commit, push, pull."
-  },
-  {
-    "categoria": "Desarrollo",
-    "keywords": ["python", "pip", "python3"],
-    "respuesta": "Instala Python: 'sudo apt install python3 python3-pip'. Verifica: 'python3 --version'. Instala paquetes: 'pip3 install nombre'. Entorno virtual: 'python3 -m venv env' luego 'source env/bin/activate'."
-  },
-  {
-    "categoria": "Desarrollo",
-    "keywords": ["node", "nodejs", "npm"],
-    "respuesta": "Instala Node.js: 'curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && sudo apt install nodejs'. Verifica: 'node --version' y 'npm --version'. Actualiza npm: 'sudo npm install -g npm@latest'."
-  },
-  {
-    "categoria": "Desarrollo",
-    "keywords": ["java", "jdk", "openjdk"],
-    "respuesta": "Instala OpenJDK: 'sudo apt install default-jdk'. Verifica: 'java -version' y 'javac -version'. Cambiar versión: 'sudo update-alternatives --config java'. JAVA_HOME: 'export JAVA_HOME=/usr/lib/jvm/default-java'."
-  },
-  {
-    "categoria": "Desarrollo",
-    "keywords": ["vscode", "visual studio code", "editor"],
-    "respuesta": "Instala: descarga .deb de code.visualstudio.com, luego 'sudo dpkg -i archivo.deb'. O por Snap: 'sudo snap install code --classic'. O repo: 'sudo apt install software-properties-common apt-transport-https && wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | sudo apt-key add -'."
-  },
-  {
-    "categoria": "Desarrollo",
-    "keywords": ["mysql", "mariadb", "base datos"],
-    "respuesta": "Instala MariaDB: 'sudo apt install mariadb-server'. Seguridad: 'sudo mysql_secure_installation'. Acceder: 'sudo mysql'. Crear DB: 'CREATE DATABASE nombre;'. Usuario: 'CREATE USER 'user'@'localhost' IDENTIFIED BY 'password';'."
-  },
-  {
-    "categoria": "Desarrollo",
-    "keywords": ["postgresql", "postgres", "psql"],
-    "respuesta": "Instala: 'sudo apt install postgresql postgresql-contrib'. Cambiar a usuario postgres: 'sudo -i -u postgres'. Acceder: 'psql'. Crear DB: 'createdb nombre'. Crear usuario: 'createuser --interactive'."
-  },
-  {
-    "categoria": "Desarrollo",
-    "keywords": ["apache", "servidor web", "httpd"],
-    "respuesta": "Instala Apache: 'sudo apt install apache2'. Inicia: 'sudo systemctl start apache2'. Habilita: 'sudo systemctl enable apache2'. Archivos en /var/www/html/. Config: /etc/apache2/. Prueba: http://localhost."
-  },
-  {
-    "categoria": "Desarrollo",
-    "keywords": ["nginx", "servidor web nginx"],
-    "respuesta": "Instala: 'sudo apt install nginx'. Inicia: 'sudo systemctl start nginx'. Config: /etc/nginx/. Sites: /etc/nginx/sites-available/. Habilita site: 'sudo ln -s /etc/nginx/sites-available/sitio /etc/nginx/sites-enabled/'. Recarga: 'sudo nginx -s reload'."
-  },
-  {
-    "categoria": "Desarrollo",
-    "keywords": ["php", "lamp", "servidor php"],
-    "respuesta": "Instala PHP: 'sudo apt install php libapache2-mod-php php-mysql'. Verifica: 'php -v'. Crea info.php: 'echo \"<?php phpinfo(); ?>\" | sudo tee /var/www/html/info.php'. Accede: http://localhost/info.php."
-  },
-  {
-    "categoria": "Multimedia",
-    "keywords": ["vlc", "reproductor video", "media player"],
-    "respuesta": "Instala VLC: 'sudo apt install vlc'. Ejecuta: 'vlc'. Codecs adicionales: 'sudo apt install ubuntu-restricted-extras'. Alternativas: mpv ('sudo apt install mpv') o Celluloid."
-  },
-  {
-    "categoria": "Multimedia",
-    "keywords": ["ffmpeg", "convertir video", "editar video"],
-    "respuesta": "Instala: 'sudo apt install ffmpeg'. Convertir: 'ffmpeg -i input.mp4 output.avi'. Extraer audio: 'ffmpeg -i video.mp4 -vn audio.mp3'. Comprimir: 'ffmpeg -i input.mp4 -vcodec h264 -acodec mp3 output.mp4'."
-  },
-  {
-    "categoria": "Multimedia",
-    "keywords": ["obs", "grabar pantalla", "streaming"],
-    "respuesta": "Instala OBS: 'sudo add-apt-repository ppa:obsproject/obs-studio && sudo apt update && sudo apt install obs-studio'. O Flatpak: 'flatpak install flathub com.obsproject.Studio'. Para grabar simple: 'sudo apt install simplescreenrecorder'."
-  },
-  {
-    "categoria": "Multimedia",
-    "keywords": ["gimp", "editar imagen", "photoshop"],
-    "respuesta": "Instala GIMP: 'sudo apt install gimp'. Ejecuta: 'gimp'. Plugins en ~/.config/GIMP/2.10/plug-ins/. Alternativas: Krita (pintura digital): 'sudo apt install krita', Inkscape (vectorial): 'sudo apt install inkscape'."
-  },
-  {
-    "categoria": "Multimedia",
-    "keywords": ["audacity", "editar audio", "grabar audio"],
-    "respuesta": "Instala: 'sudo apt install audacity'. Ejecuta: 'audacity'. Para codecs MP3: puede requerir 'sudo apt install lame'. Alternativa profesional: Ardour ('sudo apt install ardour')."
-  },
-  {
-    "categoria": "Multimedia",
-    "keywords": ["kdenlive", "editar video", "video editor"],
-    "respuesta": "Instala Kdenlive: 'sudo apt install kdenlive'. Ejecuta: 'kdenlive'. Requiere ffmpeg. Alternativas: OpenShot ('sudo apt install openshot-qt'), Shotcut (descarga de shotcut.org), DaVinci Resolve (profesional)."
-  },
-  {
-    "categoria": "Multimedia",
-    "keywords": ["spotify", "música", "streaming"],
-    "respuesta": "Instala Spotify: 'curl -sS https://download.spotify.com/debian/pubkey_7A3A762FAFD4A51F.gpg | sudo gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/spotify.gpg && echo \"deb http://repository.spotify.com stable non-free\" | sudo tee /etc/apt/sources.list.d/spotify.list && sudo apt update && sudo apt install spotify-client'."
-  },
-  {
-    "categoria": "Ofimática",
-    "keywords": ["libreoffice", "office", "documentos"],
-    "respuesta": "Instala LibreOffice: 'sudo apt install libreoffice'. Completo: 'sudo apt install libreoffice libreoffice-gtk3'. Diccionario español: 'sudo apt install libreoffice-l10n-es hunspell-es'. Alternativa online: OnlyOffice."
-  },
-  {
-    "categoria": "Ofimática",
-    "keywords": ["pdf", "leer pdf", "pdf viewer"],
-    "respuesta": "Lectores PDF: Evince (preinstalado en GNOME): 'sudo apt install evince'. Okular (KDE): 'sudo apt install okular'. Editar PDFs: 'sudo apt install pdfarranger' o 'sudo apt install pdfmod'."
-  },
-  {
-    "categoria": "Ofimática",
-    "keywords": ["latex", "tex", "documento científico"],
-    "respuesta": "Instala TeX Live: 'sudo apt install texlive-full' (grande, ~5GB) o 'sudo apt install texlive-latex-base' (básico). Editor: TeXstudio ('sudo apt install texstudio') o Overleaf (online)."
-  },
-  {
-    "categoria": "Navegadores",
-    "keywords": ["firefox", "navegador", "browser"],
-    "respuesta": "Actualizar Firefox: 'sudo apt update && sudo apt upgrade firefox'. Si quieres versión Snap: 'sudo snap install firefox'. Resetear: cierra Firefox, renombra ~/.mozilla/firefox/ y reinicia."
-  },
-  {
-    "categoria": "Navegadores",
-    "keywords": ["chrome", "google chrome", "chromium"],
-    "respuesta": "Instala Chrome: descarga .deb de google.com/chrome, luego 'sudo dpkg -i archivo.deb && sudo apt install -f'. Chromium (open source): 'sudo apt install chromium-browser' o 'sudo snap install chromium'."
-  },
-  {
-    "categoria": "Navegadores",
-    "keywords": ["brave", "navegador brave"],
-    "respuesta": "Instala Brave: 'sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg && echo \"deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main\" | sudo tee /etc/apt/sources.list.d/brave-browser-release.list && sudo apt update && sudo apt install brave-browser'."
-  },
-  {
-    "categoria": "Backup y Recuperación",
-    "keywords": ["backup", "respaldo", "copia seguridad"],
-    "respuesta": "Rsync: 'rsync -av --delete origen/ destino/'. Tar: 'tar -czvf backup-$(date +%F).tar.gz /ruta'. Herramientas GUI: Timeshift ('sudo apt install timeshift'), Deja Dup (preinstalado GNOME)."
-  },
-  {
-    "categoria": "Backup y Recuperación",
-    "keywords": ["timeshift", "restaurar sistema", "snapshot"],
-    "respuesta": "Instala: 'sudo apt install timeshift'. Ejecuta: 'sudo timeshift-gtk'. Crea snapshot: 'sudo timeshift --create'. Restaura: 'sudo timeshift --restore'. Automático: configura en Settings > Schedule."
-  },
-  {
-    "categoria": "Backup y Recuperación",
-    "keywords": ["clonezilla", "clonar disco", "imagen disco"],
-    "respuesta": "Descarga Clonezilla ISO de clonezilla.org. Crea USB booteable: 'sudo dd if=clonezilla.iso of=/dev/sdX bs=4M status=progress'. Bootea desde USB, sigue wizard para clonar disco completo o particiones."
-  },
-  {
-    "categoria": "Backup y Recuperación",
-    "keywords": ["recuperar archivos", "recuperación datos", "testdisk"],
-    "respuesta": "Instala TestDisk: 'sudo apt install testdisk'. Ejecuta: 'sudo testdisk' (recupera particiones). PhotoRec: 'sudo photorec' (recupera archivos). IMPORTANTE: no escribas en disco dañado. Para ext4: 'sudo apt install extundelete'."
-  },
-  {
-    "categoria": "Terminal y Shell",
-    "keywords": ["terminal", "consola", "bash", "comandos básicos"],
-    "respuesta": "Comandos básicos: 'ls' (listar), 'cd' (cambiar dir), 'pwd' (dir actual), 'cp' (copiar), 'mv' (mover), 'rm' (eliminar), 'mkdir' (crear carpeta), 'cat' (ver archivo), 'grep' (buscar texto), 'find' (buscar archivos)."
-  },
-  {
-    "categoria": "Terminal y Shell",
-    "keywords": ["zsh", "oh-my-zsh", "terminal mejorada"],
-    "respuesta": "Instala Zsh: 'sudo apt install zsh'. Cambia shell: 'chsh -s $(which zsh)'. Instala Oh-My-Zsh: 'sh -c \"$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\"'. Config: ~/.zshrc. Temas y plugins en ~/.oh-my-zsh/."
-  },
-  {
-    "categoria": "Terminal y Shell",
-    "keywords": ["tmux", "screen", "multiplexor terminal"],
-    "respuesta": "Instala tmux: 'sudo apt install tmux'. Inicia: 'tmux'. Atajos: Ctrl+b luego c (nueva ventana), n (siguiente), p (anterior), d (detach). Reattach: 'tmux attach'. Config: ~/.tmux.conf. Alternativa: screen."
-  },
-  {
-    "categoria": "Terminal y Shell",
-    "keywords": ["alias", "atajos comandos", "shortcuts"],
-    "respuesta": "Crea alias temporal: 'alias ll=\"ls -la\"'. Permanente: agrega a ~/.bashrc o ~/.zshrc: 'alias update=\"sudo apt update && sudo apt upgrade\"'. Recarga: 'source ~/.bashrc'. Lista alias: 'alias'."
-  },
-  {
-    "categoria": "Terminal y Shell",
-    "keywords": ["historial", "history", "comandos anteriores"],
-    "respuesta": "Ver historial: 'history'. Buscar: 'history | grep comando'. Ejecutar anterior: '!!'. Ejecutar #N: '!N'. Buscar interactivo: Ctrl+R. Limpiar: 'history -c'. Aumentar tamaño: edita ~/.bashrc: 'HISTSIZE=10000'."
-  },
-  {
-    "categoria": "Compresión y Archivos",
-    "keywords": ["zip", "comprimir", "descomprimir"],
-    "respuesta": "Comprimir: 'zip -r archivo.zip carpeta/'. Descomprimir: 'unzip archivo.zip'. Ver contenido: 'unzip -l archivo.zip'. Instala si falta: 'sudo apt install zip unzip'."
-  },
-  {
-    "categoria": "Compresión y Archivos",
-    "keywords": ["tar", "tar.gz", "tgz"],
-    "respuesta": "Comprimir: 'tar -czvf archivo.tar.gz carpeta/'. Descomprimir: 'tar -xzvf archivo.tar.gz'. Ver contenido: 'tar -tzvf archivo.tar.gz'. Solo tar: usa -cvf y -xvf (sin z). Para .tar.bz2 usa -j."
-  },
-  {
-    "categoria": "Compresión y Archivos",
-    "keywords": ["rar", "unrar", "winrar"],
-    "respuesta": "Instala: 'sudo apt install unrar' o 'sudo apt install rar' (no-free). Descomprimir: 'unrar x archivo.rar'. Comprimir: 'rar a archivo.rar carpeta/'. Ver: 'unrar l archivo.rar'."
-  },
-  {
-    "categoria": "Compresión y Archivos",
-    "keywords": ["7zip", "7z", "p7zip"],
-    "respuesta": "Instala: 'sudo apt install p7zip-full'. Comprimir: '7z a archivo.7z carpeta/'. Descomprimir: '7z x archivo.7z'. Ver: '7z l archivo.7z'. Soporta múltiples formatos."
-  },
-  {
-    "categoria": "Diagnóstico y Logs",
-    "keywords": ["error", "fallo", "problema general", "diagnóstico"],
-    "respuesta": "Diagnóstico básico: 'dmesg' (mensajes kernel), 'journalctl -xe' (logs sistema), 'systemctl status servicio' (estado servicios), 'tail -f /var/log/syslog' (logs en tiempo real). Para errores boot: 'journalctl -b -p err'."
-  },
-  {
-    "categoria": "Diagnóstico y Logs",
-    "keywords": ["error", "fallo", "problema general", "diagnóstico"],
-    "respuesta": "Diagnóstico básico: 'dmesg' (mensajes kernel), 'journalctl -xe' (logs sistema), 'systemctl status servicio' (estado servicios), 'tail -f /var/log/syslog' (logs en tiempo real). Para errores boot: 'journalctl -b -p err'."
-  },
-  {
-    "categoria": "Diagnóstico y Logs",
-    "keywords": ["journalctl", "logs sistema", "systemd logs"],
-    "respuesta": "Ver logs: 'journalctl -xe' (últimos con errores). Boot actual: 'journalctl -b'. Boot anterior: 'journalctl -b -1'. Servicio: 'journalctl -u servicio'. Tiempo real: 'journalctl -f'. Desde fecha: 'journalctl --since \"2024-01-01\" --until \"2024-01-02\"'. Limpiar: 'sudo journalctl --vacuum-time=7d'."
-  },
-  {
-    "categoria": "Diagnóstico y Logs",
-    "keywords": ["dmesg", "kernel messages", "mensajes kernel"],
-    "respuesta": "Ver mensajes: 'dmesg'. Con timestamps: 'dmesg -T'. Tiempo real: 'dmesg -w'. Solo errores: 'dmesg -l err'. Últimas líneas: 'dmesg | tail -50'. Buscar USB: 'dmesg | grep -i usb'. Limpiar buffer: 'sudo dmesg -C'."
-  },
-  {
-    "categoria": "Diagnóstico y Logs",
-    "keywords": ["syslog", "var log", "logs archivos"],
-    "respuesta": "Logs principales en /var/log/. Ver syslog: 'tail -f /var/log/syslog'. Auth logs: 'sudo cat /var/log/auth.log'. Kernel: '/var/log/kern.log'. Apache: '/var/log/apache2/error.log'. Xorg: '~/.local/share/xorg/Xorg.0.log'."
-  },
-  {
-    "categoria": "Diagnóstico y Logs",
-    "keywords": ["strace", "ltrace", "depurar programa"],
-    "respuesta": "Traza syscalls: 'strace comando'. Guarda en archivo: 'strace -o output.txt comando'. Adjunta a proceso: 'sudo strace -p PID'. Llamadas librería: 'ltrace comando'. Útil para debug de errores de ejecución."
-  },
-  {
-    "categoria": "Diagnóstico y Logs",
-    "keywords": ["crash", "core dump", "volcado memoria"],
-    "respuesta": "Habilita core dumps: 'ulimit -c unlimited'. Ver límite: 'ulimit -c'. Ubicación: 'cat /proc/sys/kernel/core_pattern'. Analiza: 'gdb programa core'. Systemd coredumps: 'coredumpctl list' y 'coredumpctl debug PID'."
-  },
-  {
-    "categoria": "Diagnóstico y Logs",
-    "keywords": ["memtest", "memoria RAM test", "probar ram"],
-    "respuesta": "Reinicia y selecciona 'Memory test (memtest86+)' en GRUB. Si no aparece: 'sudo apt install memtest86+'. Deja corriendo varias horas (mínimo 1 pase completo). Cualquier error rojo = RAM defectuosa."
-  },
-  {
-    "categoria": "Red - Avanzado",
-    "keywords": ["netstat", "puertos abiertos", "conexiones"],
-    "respuesta": "Puertos escuchando: 'netstat -tuln' o 'ss -tuln' (más moderno). Conexiones activas: 'netstat -tun' o 'ss -tun'. Con procesos: 'sudo netstat -tulnp' o 'sudo ss -tulnp'. Estadísticas: 'netstat -s'."
-  },
-  {
-    "categoria": "Red - Avanzado",
-    "keywords": ["tcpdump", "captura paquetes", "sniffer"],
-    "respuesta": "Instala: 'sudo apt install tcpdump'. Captura: 'sudo tcpdump -i eth0'. Guarda: 'sudo tcpdump -i eth0 -w captura.pcap'. Puerto específico: 'sudo tcpdump -i eth0 port 80'. Analiza con Wireshark: 'sudo apt install wireshark'."
-  },
-  {
-    "categoria": "Red - Avanzado",
-    "keywords": ["iptables avanzado", "nat", "forwarding"],
-    "respuesta": "Habilita forwarding: 'echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward'. NAT: 'sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE'. Port forward: 'sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080'. Guarda: 'sudo iptables-save > /etc/iptables/rules.v4'."
-  },
-  {
-    "categoria": "Red - Avanzado",
-    "keywords": ["bridge", "puente red", "network bridge"],
-    "respuesta": "Instala: 'sudo apt install bridge-utils'. Crea bridge: 'sudo brctl addbr br0'. Agrega interfaces: 'sudo brctl addif br0 eth0 eth1'. Activa: 'sudo ip link set br0 up'. Verifica: 'brctl show'. Útil para VMs."
-  },
-  {
-    "categoria": "Red - Avanzado",
-    "keywords": ["vlan", "802.1q", "virtual lan"],
-    "respuesta": "Instala: 'sudo apt install vlan'. Carga módulo: 'sudo modprobe 8021q'. Crea VLAN: 'sudo ip link add link eth0 name eth0.10 type vlan id 10'. Activa: 'sudo ip link set eth0.10 up'. Asigna IP: 'sudo ip addr add 192.168.10.1/24 dev eth0.10'."
-  },
-  {
-    "categoria": "Red - Avanzado",
-    "keywords": ["arp", "tabla arp", "mac address"],
-    "respuesta": "Ver tabla ARP: 'arp -n' o 'ip neigh show'. Agregar entrada: 'sudo arp -s 192.168.1.100 AA:BB:CC:DD:EE:FF'. Eliminar: 'sudo arp -d 192.168.1.100'. Limpiar cache: 'sudo ip -s -s neigh flush all'."
-  },
-  {
-    "categoria": "Red - Avanzado",
-    "keywords": ["mtr", "traceroute avanzado", "diagnóstico red"],
-    "respuesta": "Instala: 'sudo apt install mtr'. Ejecuta: 'mtr google.com'. Modo texto: 'mtr -t google.com'. Reporte: 'mtr -r -c 10 google.com'. Combina ping y traceroute mostrando pérdida de paquetes por salto."
-  },
-  {
-    "categoria": "Red - Avanzado",
-    "keywords": ["hosts", "archivo hosts", "etc hosts"],
-    "respuesta": "Edita: 'sudo nano /etc/hosts'. Formato: 'IP hostname'. Ejemplo: '192.168.1.100 miservidor.local'. Flush DNS: 'sudo systemd-resolve --flush-caches' o 'sudo /etc/init.d/nscd restart'. Verifica: 'getent hosts hostname'."
-  },
-  {
-    "categoria": "Disco y Sistema de Archivos",
-    "keywords": ["fsck", "reparar sistema archivos", "check disk"],
-    "respuesta": "Repara partición (DEBE estar desmontada): 'sudo fsck /dev/sdXN'. Automático: 'sudo fsck -y /dev/sdXN'. Fuerza check: 'sudo fsck -f /dev/sdXN'. Para root: bootea con Live USB. EXT4: 'sudo e2fsck -f /dev/sdXN'."
-  },
-  {
-    "categoria": "Disco y Sistema de Archivos",
-    "keywords": ["fstab", "montar automático", "etc fstab"],
-    "respuesta": "Edita: 'sudo nano /etc/fstab'. Formato: 'dispositivo punto_montaje tipo opciones dump pass'. Ejemplo: '/dev/sdb1 /mnt/datos ext4 defaults 0 2'. UUID mejor que /dev: 'sudo blkid'. Prueba sin reiniciar: 'sudo mount -a'."
-  },
-  {
-    "categoria": "Disco y Sistema de Archivos",
-    "keywords": ["badblocks", "sectores dañados", "bad sectors"],
-    "respuesta": "Test lectura (no destructivo): 'sudo badblocks -v /dev/sdX'. Test escritura (BORRA DATOS): 'sudo badblocks -w -v /dev/sdX'. Durante mkfs: 'sudo mkfs.ext4 -c /dev/sdXN'. Para marcar bad blocks: 'sudo e2fsck -c /dev/sdXN'."
-  },
-  {
-    "categoria": "Disco y Sistema de Archivos",
-    "keywords": ["inodos", "inodes", "sin inodos"],
-    "respuesta": "Ver uso inodos: 'df -i'. Por directorio: 'sudo find /ruta -xdev -printf \"%h\\n\" | sort | uniq -c | sort -k 1 -n'. Liberar: elimina archivos pequeños innecesarios (cache, logs). Aumentar inodos: solo al formatear con 'mkfs.ext4 -N NUMERO /dev/sdXN'."
-  },
-  {
-    "categoria": "Disco y Sistema de Archivos",
-    "keywords": ["quota", "cuotas disco", "límite espacio"],
-    "respuesta": "Instala: 'sudo apt install quota'. En /etc/fstab agrega 'usrquota,grpquota' a opciones. Remonta: 'sudo mount -o remount /'. Crea archivos: 'sudo quotacheck -cug /'. Activa: 'sudo quotaon -v /'. Edita: 'sudo edquota -u usuario'."
-  },
-  {
-    "categoria": "Disco y Sistema de Archivos",
-    "keywords": ["enlaces", "link", "ln", "symlink"],
-    "respuesta": "Enlace simbólico: 'ln -s /ruta/origen /ruta/destino'. Enlace duro: 'ln /ruta/origen /ruta/destino'. Ver enlaces: 'ls -l' (l en permisos = symlink). Encontrar enlaces rotos: 'find /ruta -xtype l'."
-  },
-  {
-    "categoria": "Disco y Sistema de Archivos",
-    "keywords": ["ncdu", "analizar espacio", "disk usage"],
-    "respuesta": "Instala: 'sudo apt install ncdu'. Analiza: 'ncdu /'. Interfaz interactiva: navega con flechas, 'd' elimina, 'g' cambia porcentajes. Más rápido que 'du'. Alternativa GUI: 'sudo apt install baobab'."
-  },
-  {
-    "categoria": "Impresión Avanzada",
-    "keywords": ["cups avanzado", "configurar impresora", "ppd"],
-    "respuesta": "Config web: http://localhost:631. Comandos: 'lpstat -t' (estado), 'lpadmin -p nombre -E -v usb://...' (agregar), 'lpoptions -d nombre' (default). Drivers PPD en /usr/share/ppd/. Logs: /var/log/cups/. Test: 'lp -d impresora archivo.txt'."
-  },
-  {
-    "categoria": "Impresión Avanzada",
-    "keywords": ["imprimir pdf", "pdf printer", "cups-pdf"],
-    "respuesta": "Instala: 'sudo apt install cups-pdf'. Auto-crea impresora virtual 'PDF'. Imprime desde cualquier app. PDFs generados en ~/PDF/. Configura en /etc/cups/cups-pdf.conf. Útil para 'imprimir' a archivo."
-  },
-  {
-    "categoria": "Kernel",
-    "keywords": ["compilar kernel", "custom kernel", "kernel source"],
-    "respuesta": "Descarga source: 'sudo apt install linux-source'. Descomprime: 'tar xf /usr/src/linux-source-*.tar.xz'. Config: 'make menuconfig'. Compila: 'make -j$(nproc)'. Instala: 'sudo make modules_install && sudo make install'. Actualiza GRUB: 'sudo update-grub'. PROCESO LARGO (1-3hrs)."
-  },
-  {
-    "categoria": "Kernel",
-    "keywords": ["módulos kernel", "lsmod", "modprobe"],
-    "respuesta": "Lista módulos: 'lsmod'. Info módulo: 'modinfo nombre'. Cargar: 'sudo modprobe nombre'. Descargar: 'sudo modprobe -r nombre'. Automático: agrega a /etc/modules. Blacklist: crea archivo en /etc/modprobe.d/blacklist-nombre.conf con 'blacklist nombre'."
-  },
-  {
-    "categoria": "Kernel",
-    "keywords": ["kernel parameters", "grub parameters", "boot parameters"],
-    "respuesta": "Temporal (en GRUB): presiona 'e', edita línea 'linux', agrega parámetros, F10 para bootear. Permanente: edita /etc/default/grub, línea GRUB_CMDLINE_LINUX_DEFAULT. Luego 'sudo update-grub'. Comunes: nomodeset, acpi=off, quiet splash."
-  },
-  {
-    "categoria": "Kernel",
-    "keywords": ["mainline kernel", "actualizar kernel", "kernel upgrade"],
-    "respuesta": "Ubuntu Mainline: 'sudo add-apt-repository ppa:cappelikan/ppa && sudo apt install mainline'. GUI para instalar kernels nuevos. O descarga .deb de kernel.ubuntu.com. Instala con 'sudo dpkg -i *.deb'. CUIDADO: kernels nuevos pueden ser inestables."
-  },
-  {
-    "categoria": "Kernel",
-    "keywords": ["eliminar kernel", "remove old kernel", "kernel cleanup"],
-    "respuesta": "Lista kernels: 'dpkg --list | grep linux-image'. Ver actual: 'uname -r'. Elimina viejos: 'sudo apt autoremove' o manual: 'sudo apt remove linux-image-VERSION'. NUNCA elimines kernel actual. Mantén al menos 2 kernels."
-  },
-  {
-    "categoria": "Performance Tuning",
-    "keywords": ["swappiness", "ajustar swap", "swap tuning"],
-    "respuesta": "Ver swappiness: 'cat /proc/sys/vm/swappiness' (default 60). Temporal: 'sudo sysctl vm.swappiness=10'. Permanente: edita /etc/sysctl.conf, agrega 'vm.swappiness=10'. Valores: 0-10 (menos swap), 60 (default), 100 (más swap). Recomendado SSD: 10."
-  },
-  {
-    "categoria": "Performance Tuning",
-    "keywords": ["io scheduler", "planificador io", "disk scheduler"],
-    "respuesta": "Ver scheduler: 'cat /sys/block/sda/queue/scheduler'. Cambiar temporal: 'echo deadline | sudo tee /sys/block/sda/queue/scheduler'. Opciones: noop, deadline, cfq, bfq. SSDs: noop o deadline. HDDs: deadline o cfq. Permanente: parámetro kernel 'elevator=deadline'."
-  },
-  {
-    "categoria": "Performance Tuning",
-    "keywords": ["preload", "precarga aplicaciones", "startup speed"],
-    "respuesta": "Instala: 'sudo apt install preload'. Inicia: 'sudo systemctl start preload'. Habilita: 'sudo systemctl enable preload'. Aprende qué apps usas y las precarga en RAM. Beneficia sistemas con RAM suficiente (4GB+). Config: /etc/preload.conf."
-  },
-  {
-    "categoria": "Performance Tuning",
-    "keywords": ["nice", "renice", "prioridad proceso"],
-    "respuesta": "Ejecutar con prioridad: 'nice -n -5 comando' (-20 máxima, 19 mínima). Cambiar prioridad: 'renice -n -5 -p PID'. Ver prioridad: 'top' o 'ps -el'. Solo root puede usar prioridades negativas. Útil para procesos CPU-intensive."
-  },
-  {
-    "categoria": "Performance Tuning",
-    "keywords": ["ionice", "prioridad io", "disk priority"],
-    "respuesta": "Ejecutar con prioridad IO: 'ionice -c 3 comando'. Clases: 1 (realtime), 2 (best-effort, default), 3 (idle). Cambiar: 'ionice -c 3 -p PID'. Ver: 'ionice -p PID'. Útil para backups que no afecten rendimiento."
-  },
-  {
-    "categoria": "Performance Tuning",
-    "keywords": ["readahead", "lectura anticipada"],
-    "respuesta": "Ver readahead: 'sudo blockdev --getra /dev/sda'. Cambiar (KB): 'sudo blockdev --setra 4096 /dev/sda'. Default: 256. SSDs: 256-1024. HDDs: 2048-8192. Permanente: agrega a /etc/rc.local o crea servicio systemd."
-  },
-  {
-    "categoria": "Seguridad Avanzada",
-    "keywords": ["ssh keys", "llave ssh", "ssh sin password"],
-    "respuesta": "Genera key: 'ssh-keygen -t ed25519' (o rsa). Copia al servidor: 'ssh-copy-id usuario@servidor'. O manual: agrega ~/.ssh/id_ed25519.pub a servidor:~/.ssh/authorized_keys. Permisos: chmod 700 ~/.ssh, chmod 600 ~/.ssh/authorized_keys."
-  },
-  {
-    "categoria": "Seguridad Avanzada",
-    "keywords": ["ssh túnel", "port forwarding", "ssh tunnel"],
-    "respuesta": "Local forward: 'ssh -L 8080:localhost:80 usuario@servidor' (accede localhost:8080). Remote forward: 'ssh -R 8080:localhost:80 usuario@servidor'. Dynamic (SOCKS): 'ssh -D 1080 usuario@servidor'. Mantener vivo: agrega ServerAliveInterval 60 a ~/.ssh/config."
-  },
-  {
-    "categoria": "Seguridad Avanzada",
-    "keywords": ["iptables logging", "firewall log", "log conexiones"],
-    "respuesta": "Log dropped packets: 'sudo iptables -A INPUT -j LOG --log-prefix \"iptables DROP: \" --log-level 4'. Luego DROP: 'sudo iptables -A INPUT -j DROP'. Logs en /var/log/kern.log o /var/log/syslog. Ver: 'sudo tail -f /var/log/kern.log | grep iptables'."
-  },
-  {
-    "categoria": "Seguridad Avanzada",
-    "keywords": ["chroot", "jaula chroot", "chroot jail"],
-    "respuesta": "Prepara entorno: 'sudo mkdir -p /chroot/{bin,lib,lib64}'. Copia binarios: 'sudo cp /bin/bash /chroot/bin/'. Copia libs: 'ldd /bin/bash' y copia las mostradas. Ejecuta: 'sudo chroot /chroot /bin/bash'. Útil para aislar procesos."
-  },
-  {
-    "categoria": "Seguridad Avanzada",
-    "keywords": ["auditd", "auditoría sistema", "audit log"],
-    "respuesta": "Instala: 'sudo apt install auditd'. Reglas: 'sudo auditctl -w /etc/passwd -p wa -k passwd_changes'. Ver logs: 'sudo ausearch -k passwd_changes'. Reportes: 'sudo aureport'. Config: /etc/audit/auditd.conf. Permanente: agrega a /etc/audit/rules.d/audit.rules."
-  },
-  {
-    "categoria": "Seguridad Avanzada",
-    "keywords": ["gpg", "cifrar archivo", "gnupg"],
-    "respuesta": "Genera key: 'gpg --full-generate-key'. Cifrar: 'gpg -e -r email@ejemplo.com archivo'. Descifrar: 'gpg -d archivo.gpg > archivo'. Listar keys: 'gpg --list-keys'. Firmar: 'gpg --sign archivo'. Verificar: 'gpg --verify archivo.sig'."
-  },
-  {
-    "categoria": "Scripts y Automatización",
-    "keywords": ["bash script", "shell script", "script básico"],
-    "respuesta": "Crea script: 'nano script.sh'. Primera línea: '#!/bin/bash'. Ejecutable: 'chmod +x script.sh'. Ejecuta: './script.sh'. Variables: 'VAR=\"valor\"'. Condicionales: 'if [ condición ]; then ... fi'. Loops: 'for i in {1..10}; do ... done'."
-  },
-  {
-    "categoria": "Scripts y Automatización",
-    "keywords": ["systemd service", "crear servicio", "custom service"],
-    "respuesta": "Crea: 'sudo nano /etc/systemd/system/miservicio.service'. Contenido: [Unit] Description=..., [Service] ExecStart=..., [Install] WantedBy=multi-user.target. Recarga: 'sudo systemctl daemon-reload'. Habilita: 'sudo systemctl enable miservicio'. Inicia: 'sudo systemctl start miservicio'."
-  },
-  {
-    "categoria": "Scripts y Automatización",
-    "keywords": ["systemd timer", "timer systemd", "cron alternativa"],
-    "respuesta": "Crea .timer: 'sudo nano /etc/systemd/system/backup.timer'. [Timer] OnCalendar=daily, Persistent=true, [Install] WantedBy=timers.target. Crea .service correspondiente. Habilita: 'sudo systemctl enable backup.timer'. Lista timers: 'systemctl list-timers'."
-  },
-  {
-    "categoria": "Scripts y Automatización",
-    "keywords": ["at", "tarea única", "schedule once"],
-    "respuesta": "Instala: 'sudo apt install at'. Programa: 'at 10:30 AM' luego escribe comandos, Ctrl+D para guardar. Lista trabajos: 'atq'. Elimina: 'atrm NUMERO'. Formatos: 'at now + 2 hours', 'at 23:00', 'at tomorrow'."
-  },
-  {
-    "categoria": "Scripts y Automatización",
-    "keywords": ["anacron", "cron offline", "cron laptop"],
-    "respuesta": "Para equipos que no están siempre encendidos. Instala: 'sudo apt install anacron'. Config: /etc/anacrontab. Formato: 'período retraso identificador comando'. Ejemplo: '1 5 backup /ruta/backup.sh' (diario, 5min delay). Se ejecuta al encender si se saltó."
-  },
-  {
-    "categoria": "Scripts y Automatización",
-    "keywords": ["watch", "ejecutar periódicamente", "repeat command"],
-    "respuesta": "Ejecuta comando cada N segundos: 'watch -n 5 comando' (cada 5 seg). Resalta cambios: 'watch -d comando'. Ejemplo útil: 'watch -n 1 df -h' (monitorea espacio disco). Útil para monitoreo temporal sin escribir script."
-  },
-  {
-    "categoria": "Texto y Procesamiento",
-    "keywords": ["grep", "buscar texto", "find text"],
-    "respuesta": "Buscar: 'grep \"texto\" archivo'. Recursivo: 'grep -r \"texto\" /ruta'. Ignora case: 'grep -i'. Invertir: 'grep -v'. Contar: 'grep -c'. Muestra línea: 'grep -n'. Regex: 'grep -E'. Contexto: 'grep -A 3 -B 3' (3 líneas antes/después)."
-  },
-  {
-    "categoria": "Texto y Procesamiento",
-    "keywords": ["sed", "reemplazar texto", "stream editor"],
-    "respuesta": "Reemplazar: 'sed \"s/viejo/nuevo/g\" archivo'. En archivo: 'sed -i \"s/viejo/nuevo/g\" archivo'. Eliminar líneas: 'sed \"/patrón/d\" archivo'. Líneas N a M: 'sed -n \"N,Mp\" archivo'. Backup: 'sed -i.bak'."
-  },
-  {
-    "categoria": "Texto y Procesamiento",
-    "keywords": ["awk", "procesar columnas", "text processing"],
-    "respuesta": "Imprimir columna: 'awk \"{print $1}\" archivo'. Múltiples: 'awk \"{print $1, $3}\"'. Separador: 'awk -F: \"{print $1}\" /etc/passwd'. Suma columna: 'awk \"{sum+=$1} END {print sum}\"'. Condicional: 'awk \"$3 > 100 {print $0}\"'."
-  },
-  {
-    "categoria": "Texto y Procesamiento",
-    "keywords": ["cut", "cortar columnas", "extract columns"],
-    "respuesta": "Cortar caracteres: 'cut -c 1-5 archivo'. Campos: 'cut -f 1,3 archivo'. Delimitador: 'cut -d: -f 1 /etc/passwd'. Complemento: 'cut --complement -f 2'. Más simple que awk para tareas básicas."
-  },
-  {
-    "categoria": "Texto y Procesamiento",
-    "keywords": ["sort", "ordenar", "sort lines"],
-    "respuesta": "Ordenar: 'sort archivo'. Reverso: 'sort -r'. Numérico: 'sort -n'. Por columna: 'sort -k 2'. Único: 'sort -u'. Ignorar case: 'sort -f'. Combina con otros: 'cat archivo | sort | uniq -c | sort -nr'."
-  },
-  {
-    "categoria": "Texto y Procesamiento",
-    "keywords": ["diff", "comparar archivos", "compare files"],
-    "respuesta": "Comparar: 'diff archivo1 archivo2'. Unified: 'diff -u'. Side-by-side: 'diff -y'. Recursivo: 'diff -r dir1 dir2'. Solo diferencias: 'diff -q'. GUI: 'sudo apt install meld' luego 'meld archivo1 archivo2'."
-  },
-  {
-    "categoria": "Texto y Procesamiento",
-    "keywords": ["wc", "contar líneas", "word count"],
-    "respuesta": "Contar todo: 'wc archivo' (líneas palabras bytes). Solo líneas: 'wc -l'. Palabras: 'wc -w'. Caracteres: 'wc -m'. Bytes: 'wc -c'. Útil con pipes: 'cat archivo | wc -l'."
-  },
-  {
-    "categoria": "Misceláneos",
-    "keywords": ["fecha", "date", "hora", "timezone"],
-    "respuesta": "Ver fecha: 'date'. Formato: 'date +%Y-%m-%d'. Cambiar zona horaria: 'sudo timedatectl set-timezone America/Bogota'. Lista zonas: 'timedatectl list-timezones'. Sincronizar: 'sudo hwclock --systohc'. NTP: 'sudo apt install ntp'."
-  },
-  {
-    "categoria": "Misceláneos",
-    "keywords": ["locale", "idioma sistema", "language"],
-    "respuesta": "Ver locale: 'locale'. Disponibles: 'locale -a'. Generar: 'sudo locale-gen es_ES.UTF-8'. Configurar: 'sudo update-locale LANG=es_ES.UTF-8'. O edita /etc/default/locale. Requiere relogin."
-  },
-  {
-    "categoria": "Misceláneos",
-    "keywords": ["man", "manual", "ayuda comando"],
-    "respuesta": "Ver manual: 'man comando'. Buscar: '/texto' dentro de man. Salir: 'q'. Secciones: 'man 5 passwd' (section 5). Buscar comando: 'man -k palabra' o 'apropos palabra'. Actualizar: 'sudo mandb'."
-  },
-  {
-    "categoria": "Misceláneos",
-    "keywords": ["which", "whereis", "type", "ubicación comando"],
-    "respuesta": "Ubicación ejecutable: 'which comando'. Más info: 'whereis comando' (binario, source, man). Tipo: 'type comando' (alias, función, binario). En PATH: 'echo $PATH'."
-  },
-  {
-    "categoria": "Misceláneos",
-    "keywords": ["tree", "árbol directorios", "directory tree"],
-    "respuesta": "Instala: 'sudo apt install tree'. Ver árbol: 'tree'. Profundidad: 'tree -L 2'. Solo directorios: 'tree -d'. Con permisos: 'tree -p'. Tamaño: 'tree -h'. Exportar: 'tree > estructura.txt'."
-  },
-  {
-    "categoria": "Misceláneos",
-    "keywords": ["file", "tipo archivo", "file type"],
-    "respuesta": "Ver tipo: 'file archivo'. MIME: 'file -i archivo'. Detallado: 'file -b archivo'. Útil para archivos sin extensión. Ejemplos: detecta ELF binary, text, image, compressed, etc."
-  },
-  {
-    "categoria": "Misceláneos",
-    "keywords": ["env", "variables entorno", "environment"],
-    "respuesta": "Ver todas: 'env' o 'printenv'. Variable específica: 'echo $VAR'. Establecer: 'export VAR=valor'. Permanente: agrega a ~/.bashrc o ~/.profile. Sistema: /etc/environment. Eliminar: 'unset VAR'."
-  }
+  {"keywords": ["no enciende", "no prende", "power", "no arranca"], "respuesta": "Si el equipo no enciende, revisa el cable de corriente, la fuente de poder y prueba otro enchufe."},
+  {"keywords": ["grub", "bootloader", "no bootea", "grub rescue"], "respuesta": "Si GRUB no arranca, inicia con un Live USB y ejecuta: 'sudo mount /dev/sdaX /mnt', 'sudo mount --bind /dev /mnt/dev', 'sudo mount --bind /proc /mnt/proc', 'sudo mount --bind /sys /mnt/sys', 'sudo chroot /mnt', 'grub-install /dev/sda', 'update-grub'."},
+  {"keywords": ["kernel panic", "kernel error", "panic kernel"], "respuesta": "Intenta arrancar con un kernel anterior desde GRUB (opción Advanced Options). Revisa logs con 'journalctl -xb'."},
+  {"keywords": ["modo emergencia", "emergency mode", "maintenance mode"], "respuesta": "Si arranca en modo emergencia, revisa /etc/fstab y comenta entradas problemáticas. Remonta root en escritura: 'mount -o remount,rw /'."},
+  {"keywords": ["dual boot", "windows", "arranque dual"], "respuesta": "Repara dual boot: 'sudo update-grub'. Si Windows no aparece, 'sudo apt install os-prober && sudo os-prober && sudo update-grub'."},
+  {"keywords": ["bootloop", "reinicio infinito", "loop arranque"], "respuesta": "Arranca en recovery desde GRUB, revisa 'journalctl -xb -p err'. Prueba 'nomodeset' para descartar gráficos."},
+  {"keywords": ["initramfs", "busybox", "error initramfs"], "respuesta": "Ejecuta 'fsck /dev/sdaX'. Si hay errores, 'fsck -y /dev/sdaX' y reinicia."},
+
+  {"keywords": ["pantalla negra", "no da imagen", "sin imagen", "black screen"], "respuesta": "Prueba 'nomodeset' en GRUB. Revisa RAM. Si inicia, instala controladores correctos."},
+  {"keywords": ["drivers", "controladores", "driver nvidia", "nvidia"], "respuesta": "NVIDIA: 'sudo ubuntu-drivers autoinstall' o 'sudo apt install nvidia-driver-XXX'. Verifica con 'nvidia-smi'."},
+  {"keywords": ["driver amd", "amd", "radeon"], "respuesta": "Drivers AMD en kernel (AMDGPU). Verifica con 'lspci -k'. Instala mesa-vulkan: 'sudo apt install mesa-vulkan-drivers'."},
+  {"keywords": ["pantalla", "resolución", "display", "monitor"], "respuesta": "Cambia resolución: 'xrandr --output HDMI-1 --mode 1920x1080 --rate 60'. Hazlo permanente con ~/.xprofile."},
+  {"keywords": ["doble monitor", "dual monitor", "dos pantallas"], "respuesta": "xrandr: 'xrandr --output HDMI-1 --auto --right-of eDP-1'. GUI: 'arandr'."},
+  {"keywords": ["tearing", "screen tearing", "parpadeo pantalla"], "respuesta": "NVIDIA: ForceFullCompositionPipeline. AMD: habilita TearFree. Edita xorg.conf.d."},
+  {"keywords": ["brillo", "brightness", "luz pantalla"], "respuesta": "'xrandr --output eDP-1 --brightness 0.8' o 'brightnessctl set 50%'."},
+  {"keywords": ["hdmi", "no detecta hdmi", "hdmi sin señal"], "respuesta": "Activa salida: 'xrandr --output HDMI-1 --auto'. Revisa cable y puerto. Verifica audio HDMI."},
+
+  {"keywords": ["wifi", "internet", "red", "no conecta wifi"], "respuesta": "Reinicia NetworkManager. 'nmcli dev wifi list' y conecta: 'nmcli dev wifi connect SSID password PASS'."},
+  {"keywords": ["ethernet", "cable red", "lan"], "respuesta": "'ip link' para ver interfaz, 'sudo ip link set eth0 up', IP: 'sudo dhclient eth0'."},
+  {"keywords": ["dns", "no resuelve", "resolución nombres"], "respuesta": "En NM: 'nmcli con mod NOMBRE ipv4.dns "8.8.8.8 8.8.4.4" ipv4.ignore-auto-dns yes' y reinicia conexión."},
+  {"keywords": ["vpn", "openvpn", "wireguard"], "respuesta": "OpenVPN: 'sudo openvpn --config archivo.ovpn'. WireGuard: 'sudo wg-quick up wg0'."},
+  {"keywords": ["firewall", "ufw", "iptables", "puerto"], "respuesta": "UFW: 'sudo ufw enable', 'sudo ufw allow 22/tcp', 'sudo ufw status'."},
+  {"keywords": ["ssh", "conexión remota", "acceso remoto"], "respuesta": "'sudo apt install openssh-server'. Inicia 'sudo systemctl start sshd'. Conéctate con 'ssh usuario@ip'."},
+  {"keywords": ["ip estática", "ip fija", "static ip"], "respuesta": "'nmcli con mod NOMBRE ipv4.addresses 192.168.1.100/24 ipv4.gateway 192.168.1.1 ipv4.dns 8.8.8.8 ipv4.method manual'."},
+  {"keywords": ["ping", "traceroute", "diagnóstico red"], "respuesta": "'ping 8.8.8.8', 'traceroute google.com', 'ss -tuln'."},
+  {"keywords": ["samba", "compartir archivos", "windows compartir"], "respuesta": "'sudo apt install samba', configura smb.conf, usuario con 'sudo smbpasswd -a'."},
+  {"keywords": ["nfs", "compartir linux", "montaje red"], "respuesta": "Servidor: 'sudo apt install nfs-kernel-server' y /etc/exports. Cliente: 'sudo mount -t nfs ip:/carpeta /mnt'."},
+
+  {"keywords": ["sonido", "audio", "no se oye", "sin audio"], "respuesta": "'alsamixer', 'pulseaudio -k && pulseaudio --start', 'aplay -l', 'speaker-test -c 2'."},
+  {"keywords": ["micrófono", "micro", "no graba"], "respuesta": "'arecord -l', 'alsamixer' F4, prueba 'arecord -d 5 test.wav'."},
+  {"keywords": ["hdmi audio", "sonido hdmi", "audio monitor"], "respuesta": "'pactl list sinks short' y 'pactl set-default-sink NOMBRE_HDMI'."},
+  {"keywords": ["bluetooth audio", "audífonos bluetooth", "headset"], "respuesta": "'sudo apt install pulseaudio-module-bluetooth bluez', 'systemctl restart bluetooth', usar 'bluetoothctl'."},
+  {"keywords": ["audio crackling", "audio entrecortado", "ruido audio"], "respuesta": "En default.pa usa 'tsched=0' y/o 'snd-hda-intel model=auto'."},
+
+  {"keywords": ["disco lleno", "espacio", "storage", "sin espacio"], "respuesta": "'df -h', 'du -sh /* 2>/dev/null | sort -h', 'sudo apt autoremove && sudo apt clean'."},
+  {"keywords": ["disco duro", "hdd", "smart", "salud disco"], "respuesta": "'sudo apt install smartmontools', 'sudo smartctl -H /dev/sda', 'sudo smartctl -a /dev/sda'."},
+  {"keywords": ["ssd", "trim", "optimizar ssd"], "respuesta": "'sudo fstrim -v /', habilita 'fstrim.timer'."},
+  {"keywords": ["particiones", "particionar", "gparted", "fdisk"], "respuesta": "'gparted' o 'sudo fdisk /dev/sda'. Lista con 'lsblk' o 'sudo fdisk -l'."},
+  {"keywords": ["formatear", "format", "mkfs"], "respuesta": "EXT4: 'sudo mkfs.ext4 /dev/sdXN'. NTFS: 'sudo mkfs.ntfs /dev/sdXN'. FAT32: 'sudo mkfs.vfat -F 32 /dev/sdXN'."},
+  {"keywords": ["montar", "mount", "umount", "desmontar"], "respuesta": "Montar: 'sudo mount /dev/sdXN /mnt'. Auto: /etc/fstab y 'sudo mount -a'."},
+  {"keywords": ["usb", "pendrive", "no detecta usb"], "respuesta": "'lsusb', 'dmesg | tail -20', 'lsblk', monta 'sudo mount /dev/sdb1 /mnt'."},
+  {"keywords": ["disco externo", "hdd externo", "external drive"], "respuesta": "'lsblk' para identificar, 'sudo mount /dev/sdb1 /mnt'. Para NTFS: 'sudo apt install ntfs-3g'."},
+  {"keywords": ["raid", "mdadm", "raid linux"], "respuesta": "'sudo apt install mdadm', 'sudo mdadm --create /dev/md0 --level=1 --raid-devices=2 ...', '/proc/mdstat'."},
+  {"keywords": ["lvm", "logical volume", "volumen lógico"], "respuesta": "'sudo lvdisplay', 'sudo lvextend -L +10G /dev/vg/lv' y 'sudo resize2fs /dev/vg/lv'."},
+
+  {"keywords": ["actualizar", "update", "upgrade", "actualización"], "respuesta": "Debian/Ubuntu: 'sudo apt update && sudo apt upgrade'. Fedora: 'sudo dnf update'. Arch: 'sudo pacman -Syu'."},
+  {"keywords": ["instalar programa", "install", "instalar paquete"], "respuesta": "Ubuntu/Debian: 'sudo apt install paquete'. Fedora: 'sudo dnf install paquete'. Arch: 'sudo pacman -S paquete'."},
+  {"keywords": ["desinstalar", "remove", "eliminar programa"], "respuesta": "Ubuntu/Debian: 'sudo apt remove paquete' o 'sudo apt purge paquete'. Fedora: 'sudo dnf remove paquete'. Arch: 'sudo pacman -Rns paquete'."},
+  {"keywords": ["repositorio", "ppa", "sources", "repo"], "respuesta": "'sudo add-apt-repository ppa:nombre/ppa' y 'sudo add-apt-repository --remove'. Revisa sources.list*."},
+  {"keywords": ["snap", "snapcraft", "paquetes snap"], "respuesta": "'snap list', 'sudo snap refresh', 'sudo snap remove paquete'."},
+  {"keywords": ["flatpak", "flathub"], "respuesta": "Instala flatpak, agrega flathub y 'flatpak install flathub nombre.app'."},
+  {"keywords": ["appimage", "aplicación portable"], "respuesta": "'chmod +x archivo.AppImage' y './archivo.AppImage'. Instala 'libfuse2'."},
+  {"keywords": ["dependencias", "dependencies", "librerías"], "respuesta": "'sudo apt install -f', 'apt-cache depends paquete', 'sudo dpkg --configure -a'."},
+  {"keywords": ["compilar", "source", "make", "cmake"], "respuesta": "Instala 'build-essential', descomprime, './configure && make && sudo make install'."},
+
+  {"keywords": ["lento", "slow", "rendimiento", "performance"], "respuesta": "'htop', 'top', 'free -h', 'iotop'. Desactiva servicios innecesarios con systemctl."},
+  {"keywords": ["cpu", "procesador", "uso cpu"], "respuesta": "Uso: 'top'/'htop'. Info: 'lscpu'. Por proceso: 'ps aux --sort=-%cpu | head'."},
+  {"keywords": ["ram", "memoria", "memory", "swap"], "respuesta": "Uso: 'free -h'. Detallado: 'vmstat'. Por proceso: 'ps aux --sort=-%mem | head'."},
+  {"keywords": ["swap", "archivo intercambio", "swapfile"], "respuesta": "'swapon --show'. Crear swapfile y añadir a /etc/fstab."},
+  {"keywords": ["temperatura", "temp", "sobrecalentamiento", "sensors"], "respuesta": "'sudo apt install lm-sensors', 'sudo sensors-detect', 'sensors'."},
+  {"keywords": ["ventilador", "fan", "cooler"], "respuesta": "Ver RPM con 'sensors'. Control con 'fancontrol'/'pwmconfig'."},
+  {"keywords": ["procesos", "process", "matar proceso", "kill"], "respuesta": "'ps aux' o 'htop'. Matar: 'kill PID', 'pkill nombre' o 'killall nombre'."},
+  {"keywords": ["servicios", "services", "systemd", "daemon"], "respuesta": "'systemctl list-units --type=service', 'systemctl status nombre', 'systemctl start/stop nombre'."},
+  {"keywords": ["cron", "tarea programada", "automatizar"], "respuesta": "'crontab -e' (min hora día mes díaSemana comando). 'crontab -l'."},
+  {"keywords": ["logs", "registros", "journalctl"], "respuesta": "'journalctl -xe', 'journalctl -b', 'journalctl -u nombre'."},
+
+  {"keywords": ["contraseña", "password", "olvidé contraseña", "reset password"], "respuesta": "Recovery desde GRUB, remonta '/' en rw y 'passwd usuario'. Con Live USB usa chroot."},
+  {"keywords": ["sudo", "permisos root", "sudoers"], "respuesta": "'sudo usermod -aG sudo usuario', 'sudo visudo'."},
+  {"keywords": ["permisos", "permission denied", "chmod", "chown"], "respuesta": "'ls -l', 'chmod 755 archivo', 'chown usuario:grupo archivo'."},
+  {"keywords": ["antivirus", "virus", "malware", "clamav"], "respuesta": "'sudo apt install clamav clamav-daemon', 'sudo freshclam', 'clamscan -r /home'."},
+  {"keywords": ["fail2ban", "seguridad ssh", "proteger ssh"], "respuesta": "Instala y configura jail.local para [sshd]. 'systemctl start fail2ban'."},
+  {"keywords": ["encriptar", "cifrar", "encryption", "luks"], "respuesta": "'sudo cryptsetup luksFormat /dev/sdXN', 'sudo cryptsetup open /dev/sdXN nombre'."},
+  {"keywords": ["selinux", "apparmor", "seguridad obligatoria"], "respuesta": "SELinux: 'sestatus', 'setenforce'. AppArmor: 'sudo aa-status', 'aa-disable perfil'."},
+  {"keywords": ["crear usuario", "new user", "adduser"], "respuesta": "'sudo adduser nombre' o 'sudo useradd -m -s /bin/bash nombre'; 'sudo passwd nombre'."},
+  {"keywords": ["grupos", "groups", "agregar grupo"], "respuesta": "'sudo groupadd nombre'; 'sudo usermod -aG grupo usuario'; 'groups usuario'."},
+  {"keywords": ["cambiar usuario", "switch user", "su"], "respuesta": "'su - usuario', 'su -', 'sudo -i'. Ejecutar como usuario: 'sudo -u usuario comando'."},
+  {"keywords": ["login automático", "autologin", "inicio sesión"], "respuesta": "GDM: /etc/gdm3/custom.conf. LightDM: /etc/lightdm/lightdm.conf (autologin-user)."},
+  {"keywords": ["bloquear usuario", "lock user", "deshabilitar"], "respuesta": "'sudo passwd -l usuario' o 'sudo usermod -L usuario'. Desbloquear: '-u'/'-U'."},
+  {"keywords": ["home directory", "directorio personal", "crear home"], "respuesta": "'sudo useradd -m usuario'. Crear manual y chown si falta."},
+  {"keywords": ["cambiar shell", "bash", "zsh", "shell usuario"], "respuesta": "'chsh -s /bin/bash' o 'chsh -s /bin/zsh'."},
+
+  {"keywords": ["terminal", "consola", "bash", "comandos básicos"], "respuesta": "Comandos: ls, cd, pwd, cp, mv, rm, mkdir, cat, grep, find."},
+  {"keywords": ["zsh", "oh-my-zsh", "terminal mejorada"], "respuesta": "Instala Zsh y Oh-My-Zsh. 'chsh -s $(which zsh)'."},
+  {"keywords": ["tmux", "screen", "multiplexor terminal"], "respuesta": "'sudo apt install tmux'. Ctrl+b c/n/p/d. 'tmux attach'."},
+  {"keywords": ["alias", "atajos comandos", "shortcuts"], "respuesta": "Define alias en ~/.bashrc o ~/.zshrc. 'source ~/.bashrc'."},
+  {"keywords": ["historial", "history", "comandos anteriores"], "respuesta": "'history', Ctrl+R, 'history -c'. Ajusta HISTSIZE."},
+
+  {"keywords": ["zip", "comprimir", "descomprimir"], "respuesta": "'zip -r archivo.zip carpeta/'. 'unzip archivo.zip'."},
+  {"keywords": ["tar", "tar.gz", "tgz"], "respuesta": "'tar -czvf archivo.tar.gz carpeta/'. 'tar -xzvf archivo.tar.gz'."},
+  {"keywords": ["rar", "unrar", "winrar"], "respuesta": "'sudo apt install unrar', 'unrar x archivo.rar'."},
+  {"keywords": ["7zip", "7z", "p7zip"], "respuesta": "'sudo apt install p7zip-full', '7z a archivo.7z carpeta/', '7z x archivo.7z'."},
+
+  {"keywords": ["error", "fallo", "problema general", "diagnóstico"], "respuesta": "'dmesg', 'journalctl -xe', 'systemctl status servicio', 'tail -f /var/log/syslog'."},
+  {"keywords": ["journalctl", "logs sistema", "systemd logs"], "respuesta": "'journalctl -xe', 'journalctl -b', 'journalctl -u nombre'."},
+  {"keywords": ["dmesg", "kernel messages", "mensajes kernel"], "respuesta": "'dmesg -T', 'dmesg -w', 'dmesg | tail -50'."},
+  {"keywords": ["syslog", "var log", "logs archivos"], "respuesta": "'tail -f /var/log/syslog', '/var/log/auth.log', '/var/log/kern.log'."},
+  {"keywords": ["strace", "ltrace", "depurar programa"], "respuesta": "'strace comando' (-o output.txt), 'sudo strace -p PID', 'ltrace'."},
+  {"keywords": ["crash", "core dump", "volcado memoria"], "respuesta": "Habilita core dumps: 'ulimit -c unlimited'. Analiza con gdb o 'coredumpctl'."},
+  {"keywords": ["memtest", "memoria RAM test", "probar ram"], "respuesta": "En GRUB: 'Memory test (memtest86+)'. Si no: 'sudo apt install memtest86+'."},
+
+  {"keywords": ["netstat", "puertos abiertos", "conexiones"], "respuesta": "'ss -tuln' o 'netstat -tuln'. Con procesos: 'sudo ss -tulnp'."},
+  {"keywords": ["tcpdump", "captura paquetes", "sniffer"], "respuesta": "'sudo apt install tcpdump' y 'sudo tcpdump -i eth0'."},
+  {"keywords": ["iptables avanzado", "nat", "forwarding"], "respuesta": "Habilita forwarding, NAT con iptables -t nat. Guarda con iptables-save."},
+  {"keywords": ["bridge", "puente red", "network bridge"], "respuesta": "'sudo apt install bridge-utils', 'sudo brctl addbr br0', 'brctl addif'."},
+  {"keywords": ["vlan", "802.1q", "virtual lan"], "respuesta": "'ip link add link eth0 name eth0.10 type vlan id 10'; 'ip addr add'; 'ip link set up'."},
+  {"keywords": ["arp", "tabla arp", "mac address"], "respuesta": "'ip neigh show'; agrega entrada con 'sudo arp -s IP MAC'."},
+  {"keywords": ["mtr", "traceroute avanzado", "diagnóstico red"], "respuesta": "'sudo apt install mtr'; 'mtr -t google.com' o 'mtr -r -c 10 google.com'."},
+  {"keywords": ["hosts", "archivo hosts", "etc hosts"], "respuesta": "Edita /etc/hosts 'IP hostname'. Flush: 'systemd-resolve --flush-caches'."},
+
+  {"keywords": ["hora incorrecta", "dual boot", "hora windows", "rtc"], "respuesta": "Windows: habilita RTC en UTC (RealTimeIsUniversal=1). Linux: 'timedatectl set-local-rtc 0' y 'timedatectl set-ntp true'."},
+  {"keywords": ["zona horaria", "timezone", "cambiar hora local"], "respuesta": "'sudo timedatectl set-timezone America/Bogota'; lista: 'timedatectl list-timezones'."},
+  {"keywords": ["sincronizar hora", "ntp", "timesyncd"], "respuesta": "'sudo timedatectl set-ntp true'; 'systemctl status systemd-timesyncd'."},
+  {"keywords": ["teclado español", "layout es", "idioma teclado"], "respuesta": "'setxkbmap es'; permanente: /etc/default/keyboard XKBLAYOUT=es."},
+  {"keywords": ["touchpad", "tap to click", "clic táctil"], "respuesta": "GNOME: 'gsettings set ... tap-to-click true'. Xorg: 'synclient TapButton1=1'."},
+  {"keywords": ["retroiluminación teclado", "teclado luz", "keyboard backlight"], "respuesta": "Ajusta brillo en /sys/class/leds/*::kbd_backlight/brightness."},
+  {"keywords": ["brillo no funciona", "acpi backlight", "backlight"], "respuesta": "Parámetro kernel 'acpi_backlight=vendor' en GRUB y 'sudo update-grub'."},
+  {"keywords": ["hibernación no funciona", "hibernate", "resume"], "respuesta": "Verifica swap >= RAM. Configura resume=UUID=... en GRUB y 'sudo update-grub'."},
+  {"keywords": ["suspensión se despierta", "wake on lan", "wake timers"], "respuesta": "Desactiva WoL con ethtool. Revisa /proc/acpi/wakeup y wakealarm."},
+  {"keywords": ["ventilador alto", "caliente", "throttling"], "respuesta": "Instala tlp, usa powertop, limpia polvo y revisa pasta térmica."},
+  {"keywords": ["bluetooth no conecta", "bluetooth falla", "rfkill bluetooth"], "respuesta": "'systemctl restart bluetooth', 'rfkill unblock'. Reempareja con bluetoothctl."},
+  {"keywords": ["webcam no funciona", "no detecta camara", "v4l2"], "respuesta": "'ls /dev/video*', 'cheese', añade usuario a grupo video."},
+  {"keywords": ["micrófono no funciona", "no graba micro", "input audio"], "respuesta": "Selecciona fuente en pavucontrol. ALSA: 'alsamixer' F4."},
+  {"keywords": ["monitor externo no detecta", "edid", "forzar xrandr"], "respuesta": "'xrandr --addmode' y 'xrandr --output ... --mode ...'."},
+  {"keywords": ["wayland pantalla", "compartir pantalla", "screen share"], "respuesta": "Usa xdg-desktop-portal/PipeWire; cambia a Xorg si falla."},
+  {"keywords": ["impresora no imprime", "cola de impresión", "cups atascado"], "respuesta": "'lpstat -t', 'cancel -a', 'systemctl restart cups', http://localhost:631."},
+  {"keywords": ["scanner no detecta", "sane", "scanimage"], "respuesta": "'scanimage -L', instala sane-airscan, usa simple-scan."},
+  {"keywords": ["docker permiso denegado", "docker.sock", "grupo docker"], "respuesta": "'sudo usermod -aG docker $USER' y relogin; prueba 'docker run hello-world'."},
+  {"keywords": ["puerto en uso", "address already in use", "liberar puerto"], "respuesta": "'sudo lsof -i :PUERTO' o 'ss -tulnp | grep :PUERTO'; mata proceso o cambia puerto."},
+  {"keywords": ["servicio falla", "systemctl failed", "unit failed"], "respuesta": "'systemctl status -l' y 'journalctl -u servicio -b'; corrige y 'systemctl daemon-reload'."},
+  {"keywords": ["ufw permitir puerto", "ufw bloquear", "abrir puerto"], "respuesta": "'sudo ufw allow 5080/tcp', 'sudo ufw delete allow 5080/tcp', 'sudo ufw status'."},
+  {"keywords": ["ssh claves", "ssh sin password", "authorized_keys"], "respuesta": "'ssh-keygen -t ed25519', 'ssh-copy-id', permisos 700/600 en ~/.ssh."},
+  {"keywords": ["git credenciales", "guardar password", "credential helper"], "respuesta": "'git config --global credential.helper store' o manager-core."},
+  {"keywords": ["python venv", "entorno virtual", "pip"], "respuesta": "'python3 -m venv venv'; activar; 'pip install -r requirements.txt'."},
+  {"keywords": ["npm permisos", "npm eacces", "nvm"], "respuesta": "Instala nvm; 'nvm install --lts'; evita 'sudo npm -g' o usa prefix en HOME."},
+  {"keywords": ["python versión", "pyenv", "alternatives"], "respuesta": "Usa pyenv o update-alternatives; aísla con venv."},
+  {"keywords": ["inodos llenos", "df -i", "sin inodos"], "respuesta": "'df -i'; elimina archivos pequeños masivos; aumentar inodos solo reformateando."},
+  {"keywords": ["limpiar apt", "cache apt", "apt clean"], "respuesta": "'sudo apt clean && sudo apt autoremove'; cuidado con kernels."},
+  {"keywords": ["ntfs no monta", "fast startup", "windows hibernación"], "respuesta": "Desactiva Hibernación/Fast Startup en Windows; 'ntfsfix /dev/sdXN'."},
+  {"keywords": ["permisos carpeta", "permission denied", "chown chmod"], "respuesta": "'sudo chown -R usuario:grupo /ruta'; 'chmod -R 755 /ruta' según necesidad."},
+  {"keywords": ["cambiar hostname", "hostnamectl", "nombre equipo"], "respuesta": "'sudo hostnamectl set-hostname mi-equipo'; revisa /etc/hosts."},
+  {"keywords": ["reiniciar nginx", "restart nginx", "nginx reload", "nginx servicio"], "respuesta": "Reiniciar: 'sudo systemctl restart nginx'. Recargar config: 'sudo systemctl reload nginx'. Probar sintaxis: 'sudo nginx -t'. Estado: 'systemctl status nginx'. Logs: '/var/log/nginx/*.log'."},
+  {"keywords": ["nginx habilitar sitio", "sites-available", "sites-enabled", "nginx site enable"], "respuesta": "Crea server block en /etc/nginx/sites-available/sitio; habilita: 'sudo ln -s /etc/nginx/sites-available/sitio /etc/nginx/sites-enabled/'; prueba 'nginx -t' y 'sudo systemctl reload nginx'."},
+  {"keywords": ["https nginx", "let's encrypt", "certbot nginx"], "respuesta": "Instala: 'sudo apt install certbot python3-certbot-nginx'. Emite: 'sudo certbot --nginx -d ejemplo.com -d www.ejemplo.com'. Renovación automática con systemd timer de certbot."},
+  {"keywords": ["reiniciar apache", "restart apache", "apache2"], "respuesta": "Reiniciar: 'sudo systemctl restart apache2'. Recargar: 'sudo systemctl reload apache2'. Estado: 'systemctl status apache2'. Logs: '/var/log/apache2/'."},
+  {"keywords": ["systemctl comandos", "administrar servicios", "services linux"], "respuesta": "Iniciar: 'sudo systemctl start servicio'. Detener: 'stop'. Reiniciar: 'restart'. Recargar: 'reload'. Habilitar: 'enable'. Deshabilitar: 'disable'. Estado: 'status'. Logs: 'journalctl -u servicio'."},
+  {"keywords": ["ver logs servicio", "logs systemd", "journalctl servicio"], "respuesta": "Últimos errores: 'journalctl -u servicio -p err -n 50'. Tiempo real: 'journalctl -u servicio -f'. Boot actual: 'journalctl -u servicio -b'."},
+  {"keywords": ["reiniciar postgresql", "restart postgres", "postgres service"], "respuesta": "'sudo systemctl restart postgresql'. Ver DBs: 'sudo -u postgres psql -c "\\l"'. Cambiar usuario: 'sudo -u postgres psql'."},
+  {"keywords": ["reiniciar mysql", "restart mariadb", "mysql service"], "respuesta": "MySQL/MariaDB: 'sudo systemctl restart mysql' (o 'mariadb'). Estado: 'systemctl status mysql'. Logs: '/var/log/mysql/'."},
+  {"keywords": ["reiniciar docker", "restart docker service", "docker daemon"], "respuesta": "'sudo systemctl restart docker'. Ver contenedores: 'docker ps'. Logs contenedor: 'docker logs -f NOMBRE'."},
+  {"keywords": ["reiniciar networkmanager", "restart network manager", "reiniciar red"], "respuesta": "'sudo systemctl restart NetworkManager'. Ver interfaces: 'ip a'. Redes WiFi: 'nmcli dev wifi list'."},
+  {"keywords": ["reiniciar ssh", "restart sshd", "ssh service"], "respuesta": "'sudo systemctl restart sshd'. Estado: 'systemctl status sshd'. Cambios en /etc/ssh/sshd_config requieren 'sudo systemctl reload sshd'."},
+  {"keywords": ["recargar ufw", "ufw reload", "firewall reload"], "respuesta": "'sudo ufw reload'. Habilitar: 'sudo ufw enable'. Listar reglas: 'sudo ufw status numbered'."}
 ]
