@@ -205,7 +205,18 @@ def responder(pregunta: str, session_id: str | None = None) -> str:
     session_id = session_id or "default"
     state = _get_state(session_id)
 
-    # 1) Detección de intenciones para activar árboles
+    # 1) Base de conocimiento SIEMPRE primero
+    for item in BASE_CONOCIMIENTO:
+        try:
+            keywords = item.get("keywords", [])
+            respuesta = item.get("respuesta", "")
+        except AttributeError:
+            continue
+        for kw in keywords:
+            if kw.lower() in pregunta:
+                return respuesta
+
+    # 2) Detección de intenciones para activar árboles
     if any(frase in pregunta for frase in INTENCIONES_BOOT) or (
         ("linux" in pregunta and "arranca" in pregunta) or ("ubuntu" in pregunta and "arranca" in pregunta)
     ):
@@ -238,7 +249,7 @@ def responder(pregunta: str, session_id: str | None = None) -> str:
     if any(frase in pregunta for frase in INTENCIONES_NGINX):
         return _activar_arbol(session_id, "nginx")
 
-    # 2) Si ya está en modo diagnóstico, navegar el árbol correspondiente (sí/no)
+    # 3) Si ya está en modo diagnóstico, navegar el árbol correspondiente (sí/no)
     if state["modo"] == "diagnostico" and state["arbol"] in DIAGNOSTICOS:
         diagnostico, soluciones = DIAGNOSTICOS[state["arbol"]]
         paso = state["paso"]
@@ -264,19 +275,26 @@ def responder(pregunta: str, session_id: str | None = None) -> str:
             return soluciones.get(resultado, "No se encontró solución para este caso.")
 
         else:
-            return "Responde con 'sí' o 'no', por favor."
+            # Permitir cancelar el diagnóstico con comandos comunes
+            if pregunta in {"cancelar", "salir", "reset", "reiniciar"}:
+                _reset_state(session_id)
+                return "Diagnóstico cancelado. ¿En qué más puedo ayudarte?"
 
-    # 3) Búsqueda en base de conocimiento (keywords)
-    for item in BASE_CONOCIMIENTO:
-        try:
-            keywords = item.get("keywords", [])
-            respuesta = item.get("respuesta", "")
-        except AttributeError:
-            continue
+            # Si no es una respuesta sí/no, intentamos responder desde la base de conocimiento
+            # para permitir cambiar de tema en medio del diagnóstico.
+            for item in BASE_CONOCIMIENTO:
+                try:
+                    keywords = item.get("keywords", [])
+                    respuesta = item.get("respuesta", "")
+                except AttributeError:
+                    continue
 
-        for kw in keywords:
-            if kw.lower() in pregunta:
-                return respuesta
+                for kw in keywords:
+                    if kw.lower() in pregunta:
+                        _reset_state(session_id)
+                        return respuesta
+
+            return "Responde con 'sí' o 'no', por favor. Escribe 'cancelar' para salir del diagnóstico."
 
     # 4) Mensaje por defecto
     return (
