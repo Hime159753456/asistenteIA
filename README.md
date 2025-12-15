@@ -5,10 +5,15 @@ Proyecto frontend de una interfaz de chat estilo terminal con efecto “Matrix�
 ## Estructura del proyecto
 
 ```
-IA proyecto final asistente/
+IA proyecto final asistente/front
 ├─ index.html        # Página principal (usa CSS y JS externos)
 ├─ style.css         # Estilos de la UI tipo terminal
 └─ script.js         # Lógica de efecto matrix y chat (fetch al backend)
+IA proyecto final asistente/front
+├─ base_conocimiento.json
+├─ apy.py
+├─ modelo.py
+└─ diagnosticos.py
 ```
 
 ## Requisitos
